@@ -39,3 +39,4 @@ CMakeFiles/
 CMakeDoxy*
 libraries/glad.zip
 .cache
+.compile_commands.json
