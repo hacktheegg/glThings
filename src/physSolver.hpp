@@ -126,6 +126,9 @@ void gravitate() {
 
   for (auto &obj1 : objects) {
 
+    obj1.acceleration[1] += -9.8f;
+
+    /*
     for (auto &obj2 : objects) {
 
       float posDifference[2] = {
@@ -148,6 +151,7 @@ void gravitate() {
       }
 
     }
+    */
 
   }
 
@@ -161,8 +165,8 @@ void update(double deltaTime) {
 
     gravitate();
     step(deltaTime/substeps);
-    //constrain();
-    //collide();
+    constrain();
+    collide();
 
   }
 

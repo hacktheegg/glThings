@@ -29,13 +29,13 @@ void processInput(GLFWwindow *window) {
     double xpos = 0.0;
     double ypos = 0.0;
     glfwGetCursorPos(window, &xpos, &ypos);
-      physSolver::newPhysObj(
-        {
-          ((float)xpos/512*2)-1.0f,
-          -(((float)ypos/512*2)-1.0f)
-        },
-        0.03f
-      );
+    physSolver::newPhysObj(
+      {
+        ((float)xpos/512*2)-1.0f,
+        -(((float)ypos/512*2)-1.0f)
+      },
+      0.01f
+    );
   } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
     clickState = false;
   }
@@ -48,7 +48,7 @@ void processInput(GLFWwindow *window) {
         ((float)xpos/512*2)-1.0f,
         -(((float)ypos/512*2)-1.0f)
       },
-      0.03f
+      0.01f
     );
   }
 }
