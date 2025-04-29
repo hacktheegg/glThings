@@ -1,14 +1,21 @@
 // https://learnopengl.com/Getting-started/Hello-Window
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <math.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "GLManager.hpp"
+#include <vector>
+#include "physSolver.hpp"
+#include "renderer.hpp"
 #include "shader_s.hpp"
 
 const float pi = 3.14159265;
+
+
+
+
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -48,50 +55,19 @@ int main() {
 
 
 
-  float points[] = {
-     0.90f,  0.90f,  0.00f,  1.00f,  0.90f, 0.90f, 0.90f, 1.00f,
-     0.90f,  0.00f,  0.00f,  1.00f,  0.00f, 0.00f, 0.90f, 1.00f,
-     0.00f,  0.90f,  0.00f,  1.00f,  0.90f, 0.00f, 0.00f, 1.00f,
-     0.00f,  0.00f,  0.00f,  1.00f,  0.90f, 0.90f, 0.90f, 1.00f,
-    -0.90f, -0.00f, -0.00f,  1.00f,  0.00f, 0.00f, 0.90f, 1.00f,
-    -0.00f, -0.90f, -0.00f,  1.00f,  0.90f, 0.00f, 0.00f, 1.00f,
-    -0.90f, -0.90f, -0.00f,  1.00f,  0.90f, 0.90f, 0.90f, 1.00f
-  };
-
-  unsigned int indices[] = {
-    0, 1, 3,
-    0, 2, 3,
-    3, 4, 6, 5
-  };
-
   //// SHADERS ////
   Shader ourShader("./shader.vert", "./shader.frag");
-  /*
-  unsigned int VAO, VBO, EBO;
-
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
 
 
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_DYNAMIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  physSolver::physObject newObj;
+  newObj.origin[0] = 0.0f;
+  newObj.origin[1] = 0.0f;
+  newObj.radius = 0.5f;
 
-  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
+  physSolver::newPhysObj(newObj);
 
-  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-  */
-
-
-  glThings::glManager newManager;
-  newManager.createSquare(0.0f,1.0f,0.0f,1.0f);
-  newManager.createSquare(0.0f,-1.0f,0.0f,-1.0f);
+  renderer::init();
 
 
   // uncomment this call to draw in wireframe polygons.
@@ -113,14 +89,9 @@ int main() {
 
     ourShader.use();
 
-    newManager.renderObjects();
+    physSolver::renderObjects();
 
-    /*
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * 0));
 
-    glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * 6));
-    */
 
     // Modes (Swap out the first object given to glDrawElements
     /*
