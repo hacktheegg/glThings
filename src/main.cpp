@@ -1,17 +1,14 @@
 // https://learnopengl.com/Getting-started/Hello-Window
 
-#include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <math.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <vector>
+
 #include "physSolver.hpp"
 #include "renderer.hpp"
 #include "shader_s.hpp"
-
-const float pi = 3.14159265;
 
 
 
@@ -59,13 +56,14 @@ int main() {
   Shader ourShader("./shader.vert", "./shader.frag");
 
 
+  
+  renderer::circle background;
+  background.origin[0] = 0.0f;
+  background.origin[1] = 0.0f;
+  background.radius = 0.9f;
 
-  physSolver::physObject newObj;
-  newObj.origin[0] = 0.0f;
-  newObj.origin[1] = 0.0f;
-  newObj.radius = 0.5f;
-
-  physSolver::newPhysObj(newObj);
+  physSolver::newPhysObj({ 0.0f, 0.0f }, 0.1f);
+  physSolver::newPhysObj({ 0.5f, 0.5f }, 0.15f);
 
   renderer::init();
 
@@ -73,7 +71,13 @@ int main() {
   // uncomment this call to draw in wireframe polygons.
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+  double oldTime = glfwGetTime();
+  double newTime = glfwGetTime();
+
   while (!glfwWindowShouldClose(window)) {
+
+    newTime = glfwGetTime();
+    double deltaTime = newTime - oldTime;
 
     processInput(window);
 
@@ -86,12 +90,17 @@ int main() {
       0.80f, 0.40, 0.20, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-
     ourShader.use();
 
+
+
+    physSolver::objects[0].origin[0] = deltaTime*5*100;
+    //physSolver::objects[0].origin[1] = physSolver::objects[0].origin[1] + ;
+
+
+
+    //render::circle(background);
     physSolver::renderObjects();
-
-
 
     // Modes (Swap out the first object given to glDrawElements
     /*
@@ -106,6 +115,8 @@ int main() {
     */
     glfwSwapBuffers(window);
     glfwPollEvents();
+
+    oldTime = newTime;
   }
 
 

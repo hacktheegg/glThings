@@ -2,9 +2,13 @@
 #define RENDERER
 
 #include <cmath>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <vector>
+
+
+
+
 
 namespace renderer {
 
@@ -61,7 +65,7 @@ namespace render {
 
     }
 
-    //glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, pointCount);
