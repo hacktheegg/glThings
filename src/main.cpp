@@ -14,6 +14,8 @@
 
 
 
+bool clickState = false;
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
@@ -21,6 +23,41 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  }
+  if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !clickState) {
+    clickState = true;
+    double xpos = 0.0;
+    double ypos = 0.0;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    //if (xpos != NULL && ypos != NULL) {
+      //std::cout << "xpos: " << xpos << std::endl;
+      //std::cout << "ypos: " << ypos << std::endl;
+      physSolver::newPhysObj(
+        {
+          ((float)xpos/512*2)-1.0f,
+          -(((float)ypos/512*2)-1.0f)
+        },
+        0.03f
+      );
+    //}
+  } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
+    clickState = false;
+  }
+  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+    double xpos = 0.0;
+    double ypos = 0.0;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    //if (xpos != NULL && ypos != NULL) {
+      //std::cout << "xpos: " << xpos << std::endl;
+      //std::cout << "ypos: " << ypos << std::endl;
+      physSolver::newPhysObj(
+        {
+          ((float)xpos/512*2)-1.0f,
+          -(((float)ypos/512*2)-1.0f)
+        },
+        0.03f
+      );
+    //}
   }
 }
 
@@ -57,13 +94,15 @@ int main() {
 
 
   
-  renderer::circle background;
-  background.origin[0] = 0.0f;
-  background.origin[1] = 0.0f;
-  background.radius = 0.9f;
+  physSolver::setConstraint({ 0.0f, 0.0f }, 0.9f);
 
-  physSolver::newPhysObj({ 0.0f, 0.0f }, 0.1f);
-  physSolver::newPhysObj({ 0.5f, 0.5f }, 0.15f);
+  /*for (int i = 0; i < 20; i++) {
+
+    physSolver::newPhysObj({ (float)i, 0.0f }, (float)i/100);
+
+  }*/
+  //physSolver::newPhysObj({ 0.8f, 0.0f }, 0.1f);
+  //physSolver::newPhysObj({ -0.75, 0.0f }, 0.15f);
 
   renderer::init();
 
@@ -77,7 +116,7 @@ int main() {
   while (!glfwWindowShouldClose(window)) {
 
     newTime = glfwGetTime();
-    double deltaTime = newTime - oldTime;
+    double deltaTime = ( newTime - oldTime ) / 1.0f;
 
     processInput(window);
 
@@ -94,12 +133,12 @@ int main() {
 
 
 
-    physSolver::objects[0].origin[0] = deltaTime*5*100;
+    physSolver::update(deltaTime);
+
     //physSolver::objects[0].origin[1] = physSolver::objects[0].origin[1] + ;
 
 
 
-    //render::circle(background);
     physSolver::renderObjects();
 
     // Modes (Swap out the first object given to glDrawElements

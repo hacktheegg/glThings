@@ -1,6 +1,8 @@
 #ifndef PHYSSOLVER
 #define PHYSSOLVER
 
+#include <cmath>
+#include <iostream>
 #include <vector>
 
 #include "renderer.hpp"
@@ -13,20 +15,145 @@ namespace physSolver {
 
 struct physObject {
 
-  float origin[2] = { 0.0f, 0.0f };
+  float positionOld[2] = { 0.0f, 0.0f };
+  float position[2] = { 0.0f, 0.0f };
   float radius = 0.1f;
+
+  float acceleration[2] = { 0.0f, 0.0f };
 
 };
 
-
-
 std::vector<physObject> objects = {};
 
-int newPhysObj(std::vector<float> origin = { 0.0f, 0.0f }, float radius = 0.1f) {
+physObject constraint;
+
+
+
+void setConstraint(std::vector<float> position = { 0.0f, 0.0f }, float radius = 0.9f) {
+
+  constraint.radius = radius;
+  constraint.position[0] = position[0];
+  constraint.position[1] = position[1];
+
+}
+
+void step(double deltaTime) {
+
+  // Apply Physics
+  for (auto &obj : objects) {
+    for (int i = 0; i < 2; i++) {
+
+      float velocity = obj.position[i] - obj.positionOld[i];
+
+      obj.positionOld[i] = obj.position[i];
+
+      obj.position[i] += velocity + obj.acceleration[i] * deltaTime * deltaTime;
+
+      obj.acceleration[i] = 0.0f;
+
+    }
+
+  }
+
+}
+
+void constrain() {
+
+  for (auto &obj : objects) {
+
+    float posDifference[2] = {
+      obj.position[0] - constraint.position[0],
+      obj.position[1] - constraint.position[1]
+    };
+
+    float distance = sqrtf((posDifference[0]*posDifference[0]) + (posDifference[1]*posDifference[1]));
+
+    if ((distance + obj.radius) > constraint.radius) {
+
+      float movementLine[2] = {
+        posDifference[0] / distance,
+        posDifference[1] / distance
+      };
+
+      obj.position[0] = constraint.position[0] + movementLine[0] * (constraint.radius - obj.radius);
+      obj.position[1] = constraint.position[1] + movementLine[1] * (constraint.radius - obj.radius);
+
+    }
+
+  }
+
+}
+
+void collide() {
+
+  for (auto &obj1 : objects) {
+
+    for (auto &obj2 : objects) {
+
+      if (&obj1 != &obj2) {
+
+        float posDifference[2] = {
+          obj1.position[0] - obj2.position[0],
+          obj1.position[1] - obj2.position[1]
+        };
+
+        float distance = sqrtf((posDifference[0]*posDifference[0]) + (posDifference[1]*posDifference[1]));
+
+        float movementLine[2] = {
+          posDifference[0] / distance,
+          posDifference[1] / distance
+        };
+
+        if (distance < obj1.radius + obj2.radius) {
+
+          obj1.position[0] += movementLine[0] * 0.5f * ( (obj1.radius + obj2.radius) - distance );
+          obj1.position[1] += movementLine[1] * 0.5f * ( (obj1.radius + obj2.radius) - distance );
+
+          obj2.position[0] -= movementLine[0] * 0.5f * ( (obj1.radius + obj2.radius) - distance );
+          obj2.position[1] -= movementLine[1] * 0.5f * ( (obj1.radius + obj2.radius) - distance );
+
+        }
+
+      }
+
+    }
+
+  }
+
+}
+
+void gravitate() {
+
+  for (auto &obj : objects) {
+
+    obj.acceleration[1] += -9.8f;
+
+  }
+
+}
+
+void update(double deltaTime) {
+
+  int substeps = 16;
+
+  for (int i = 0; i < substeps; i++) {
+
+    gravitate();
+    step(deltaTime/substeps);
+    constrain();
+    collide();
+
+  }
+
+}
+
+int newPhysObj(std::vector<float> position = { 0.0f, 0.0f }, float radius = 0.1f) {
 
   physObject object;
-  object.origin[0] = origin[0];
-  object.origin[1] = origin[1];
+  object.positionOld[0] = position[0];
+  object.positionOld[1] = position[1];
+  object.position[0] = position[0];
+  object.position[1] = position[1];
   object.radius = radius;
 
   objects.push_back(object);
@@ -37,14 +164,30 @@ int newPhysObj(std::vector<float> origin = { 0.0f, 0.0f }, float radius = 0.1f) 
 
 void renderObjects() {
 
+  renderer::colour backgroundColour;
+  backgroundColour.colour[0] = 0.4f;
+  backgroundColour.colour[1] = 0.3f;
+  backgroundColour.colour[2] = 0.2f;
+
+  renderer::colour defaultColour;
+  defaultColour.colour[0] = 0.3f;
+  defaultColour.colour[1] = 0.6f;
+  defaultColour.colour[2] = 0.9f;
+
+  renderer::circle tmpCircle;
+  tmpCircle.origin[0] = constraint.position[0];
+  tmpCircle.origin[1] = constraint.position[1];
+  tmpCircle.radius = constraint.radius;
+
+  render::circle(tmpCircle, backgroundColour);
+
   for (auto &obj : objects) {
   
-    renderer::circle tmpCircle;
-    tmpCircle.origin[0] = obj.origin[0];
-    tmpCircle.origin[1] = obj.origin[1];
+    tmpCircle.origin[0] = obj.position[0];
+    tmpCircle.origin[1] = obj.position[1];
     tmpCircle.radius = obj.radius;
 
-    render::circle(tmpCircle);
+    render::circle(tmpCircle, defaultColour);
 
   }
 

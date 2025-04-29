@@ -19,6 +19,12 @@ struct circle {
 
 };
 
+struct colour {
+
+  float colour[3] = { 0.5f, 0.5f, 0.5f };
+
+};
+
 unsigned int VertexArrayObject, VertexBufferObject;
 
 void init() {
@@ -43,9 +49,9 @@ void init() {
 
 namespace render {
 
-  void circle(renderer::circle object) {
+  void circle(renderer::circle object, renderer::colour colour) {
 
-    int pointCount = 4*6;
+    int pointCount = 4*12;
     float* points = new float[pointCount*8];
 
     for (int counter = 0; counter < pointCount; counter++) {
@@ -58,9 +64,9 @@ namespace render {
     
       points[(counter*8)+2] = 0.0f;
       points[(counter*8)+3] = 1.0f;
-      points[(counter*8)+4] = 0.3f;
-      points[(counter*8)+5] = 0.6f;
-      points[(counter*8)+6] = 0.9f;
+      points[(counter*8)+4] = colour.colour[0];
+      points[(counter*8)+5] = colour.colour[1];
+      points[(counter*8)+6] = colour.colour[2];
       points[(counter*8)+7] = 1.0f;
 
     }
