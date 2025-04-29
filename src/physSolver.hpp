@@ -124,9 +124,30 @@ void collide() {
 
 void gravitate() {
 
-  for (auto &obj : objects) {
+  for (auto &obj1 : objects) {
 
-    obj.acceleration[1] += -9.8f;
+    for (auto &obj2 : objects) {
+
+      float posDifference[2] = {
+        obj1.position[0] - obj2.position[0],
+        obj1.position[1] - obj2.position[1]
+      };
+
+      float distance = sqrtf((posDifference[0]*posDifference[0]) + (posDifference[1]*posDifference[1]));
+
+      float movementLine[2] = {
+        posDifference[0] / distance,
+        posDifference[1] / distance
+      };
+
+      if (&obj1 != &obj2) {
+
+          obj1.acceleration[0] -= movementLine[0] * ( 1 / ( 50 * ( distance )));
+          obj1.acceleration[1] -= movementLine[1] * ( 1 / ( 50 * ( distance )));
+
+      }
+
+    }
 
   }
 
@@ -140,8 +161,8 @@ void update(double deltaTime) {
 
     gravitate();
     step(deltaTime/substeps);
-    constrain();
-    collide();
+    //constrain();
+    //collide();
 
   }
 

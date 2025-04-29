@@ -29,9 +29,6 @@ void processInput(GLFWwindow *window) {
     double xpos = 0.0;
     double ypos = 0.0;
     glfwGetCursorPos(window, &xpos, &ypos);
-    //if (xpos != NULL && ypos != NULL) {
-      //std::cout << "xpos: " << xpos << std::endl;
-      //std::cout << "ypos: " << ypos << std::endl;
       physSolver::newPhysObj(
         {
           ((float)xpos/512*2)-1.0f,
@@ -39,7 +36,6 @@ void processInput(GLFWwindow *window) {
         },
         0.03f
       );
-    //}
   } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
     clickState = false;
   }
@@ -47,17 +43,13 @@ void processInput(GLFWwindow *window) {
     double xpos = 0.0;
     double ypos = 0.0;
     glfwGetCursorPos(window, &xpos, &ypos);
-    //if (xpos != NULL && ypos != NULL) {
-      //std::cout << "xpos: " << xpos << std::endl;
-      //std::cout << "ypos: " << ypos << std::endl;
-      physSolver::newPhysObj(
-        {
-          ((float)xpos/512*2)-1.0f,
-          -(((float)ypos/512*2)-1.0f)
-        },
-        0.03f
-      );
-    //}
+    physSolver::newPhysObj(
+      {
+        ((float)xpos/512*2)-1.0f,
+        -(((float)ypos/512*2)-1.0f)
+      },
+      0.03f
+    );
   }
 }
 
@@ -116,7 +108,7 @@ int main() {
   while (!glfwWindowShouldClose(window)) {
 
     newTime = glfwGetTime();
-    double deltaTime = ( newTime - oldTime ) / 1.0f;
+    double deltaTime = ( newTime - oldTime ) * 1.0f;
 
     processInput(window);
 
@@ -133,7 +125,9 @@ int main() {
 
 
 
-    physSolver::update(deltaTime);
+    if (newTime > 5) {
+      physSolver::update(deltaTime);
+    }
 
     //physSolver::objects[0].origin[1] = physSolver::objects[0].origin[1] + ;
 
