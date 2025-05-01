@@ -76,6 +76,8 @@ namespace render {
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, pointCount);
 
+    delete [] points;
+
   }
 
 }

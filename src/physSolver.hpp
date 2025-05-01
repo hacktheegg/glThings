@@ -2,6 +2,7 @@
 #define PHYSSOLVER
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 
@@ -43,7 +44,11 @@ void step(double deltaTime) {
   for (auto &obj : objects) {
     for (int i = 0; i < 2; i++) {
 
-      float velocity = obj.position[i] - obj.positionOld[i];
+      float velocity = ( obj.position[i] - obj.positionOld[i] );
+
+      if (i == 0) {
+        velocity = ( obj.position[i] - obj.positionOld[i] ) * 0.995;
+      }
 
       obj.positionOld[i] = obj.position[i];
 
@@ -126,7 +131,17 @@ void gravitate() {
 
   for (auto &obj1 : objects) {
 
-    obj1.acceleration[1] += -9.8f;
+    if (obj1.position[1] < 0.25f && std::abs(obj1.position[0]) < 0.075f) {
+      obj1.acceleration[1] -= -9.8f / 1.5f;
+
+      obj1.acceleration[0] -= obj1.position[0] * 75.0f;
+
+    } else if (obj1.position[1] >= 0.25f) {
+      if (obj1.position[0] < 0) { obj1.acceleration[0] += -0.1f; }
+      else if (obj1.position[0] >= 0) { obj1.acceleration[0] += 0.1f; }
+    } else {
+      obj1.acceleration[1] += -9.8f;
+    }
 
     /*
     for (auto &obj2 : objects) {

@@ -31,10 +31,10 @@ void processInput(GLFWwindow *window) {
     glfwGetCursorPos(window, &xpos, &ypos);
     physSolver::newPhysObj(
       {
-        ((float)xpos/512*2)-1.0f,
-        -(((float)ypos/512*2)-1.0f)
+        ((float)xpos/1024*2)-1.0f,
+        -(((float)ypos/1024*2)-1.0f)
       },
-      0.01f
+      0.02f
     );
   } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
     clickState = false;
@@ -45,10 +45,10 @@ void processInput(GLFWwindow *window) {
     glfwGetCursorPos(window, &xpos, &ypos);
     physSolver::newPhysObj(
       {
-        ((float)xpos/512*2)-1.0f,
-        -(((float)ypos/512*2)-1.0f)
+        ((float)xpos/1024*2)-1.0f,
+        -(((float)ypos/1024*2)-1.0f)
       },
-      0.01f
+      0.02f
     );
   }
 }
@@ -65,7 +65,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
   // initialise GLFW window
-  GLFWwindow *window = glfwCreateWindow(512, 512, "glThings", NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(1024, 1024, "glThings", NULL, NULL);
   if (window == NULL) {
     std::cout << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
@@ -88,11 +88,13 @@ int main() {
   
   physSolver::setConstraint({ 0.0f, 0.0f }, 0.9f);
 
-  /*for (int i = 0; i < 20; i++) {
+  for (int x = -10; x < 10; x++) {
+    for (int y = -10; y < 10; y++) {
 
-    physSolver::newPhysObj({ (float)i, 0.0f }, (float)i/100);
+      physSolver::newPhysObj({ (float)x/25, (float)y/25 }, 0.02f);
 
-  }*/
+    }
+  }
   //physSolver::newPhysObj({ 0.8f, 0.0f }, 0.1f);
   //physSolver::newPhysObj({ -0.75, 0.0f }, 0.15f);
 
