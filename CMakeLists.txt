@@ -7,6 +7,8 @@ add_library(glad STATIC
     "${PROJECT_SOURCE_DIR}/dep/glad/include/glad/glad.h"
 )
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Set include directory for GLAD
 target_include_directories(glad PUBLIC
     "${PROJECT_SOURCE_DIR}/dep/glad/include"

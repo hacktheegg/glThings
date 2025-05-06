@@ -6,12 +6,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "physSolver.hpp"
+//#include "physSolver.hpp"
 #include "renderer.hpp"
 #include "shader_s.hpp"
 
 
-
+int windowWidth = 512;
+int windowHeight = 512;
 
 
 bool clickState = false;
@@ -24,6 +25,7 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
+  /*
   if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !clickState) {
     clickState = true;
     double xpos = 0.0;
@@ -31,8 +33,8 @@ void processInput(GLFWwindow *window) {
     glfwGetCursorPos(window, &xpos, &ypos);
     physSolver::newPhysObj(
       {
-        ((float)xpos/1024*2)-1.0f,
-        -(((float)ypos/1024*2)-1.0f)
+        ((float)xpos/windowWidth*2)-1.0f,
+        -(((float)ypos/windowHeight*2)-1.0f)
       },
       0.02f
     );
@@ -45,12 +47,13 @@ void processInput(GLFWwindow *window) {
     glfwGetCursorPos(window, &xpos, &ypos);
     physSolver::newPhysObj(
       {
-        ((float)xpos/1024*2)-1.0f,
-        -(((float)ypos/1024*2)-1.0f)
+        ((float)xpos/windowWidth*2)-1.0f,
+        -(((float)ypos/windowHeight*2)-1.0f)
       },
       0.02f
     );
   }
+  */
 }
 
 int main() {
@@ -65,7 +68,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
   // initialise GLFW window
-  GLFWwindow *window = glfwCreateWindow(1024, 1024, "glThings", NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(windowWidth, windowHeight, "glThings", NULL, NULL);
   if (window == NULL) {
     std::cout << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
@@ -84,19 +87,40 @@ int main() {
   //// SHADERS ////
   Shader ourShader("./shader.vert", "./shader.frag");
 
+  renderer::colour black;
+  renderer::colour red;
+  renderer::colour green;
+  renderer::colour blue;
+  renderer::colour white;
 
+  black.rgb = { 0.0f, 0.0f, 0.0f };
+  red.rgb =   { 1.0f, 0.0f, 0.0f };
+  green.rgb = { 0.0f, 1.0f, 0.0f };
+  blue.rgb =  { 0.0f, 0.0f, 1.0f };
+  white.rgb = { 1.0f, 1.0f, 1.0f };
+
+
+  renderer::rectangle background;
+  background.wallsX = { -1.0f, 1.0f };
+  background.wallsY = { -1.0f, 1.0f };
+
+  renderer::circle exCircle;
+  exCircle.origin = { -0.875f, 0.875f };
+  exCircle.radius = 0.125f;
+
+  renderer::rectangle exRectangle;
+  exRectangle.wallsX = { -0.75f, -0.5f };
+  exRectangle.wallsY = {  0.75f,  1.0f };
   
-  physSolver::setConstraint({ 0.0f, 0.0f }, 0.9f);
-
-  for (int x = -10; x < 10; x++) {
-    for (int y = -10; y < 10; y++) {
-
-      physSolver::newPhysObj({ (float)x/25, (float)y/25 }, 0.02f);
-
-    }
-  }
-  //physSolver::newPhysObj({ 0.8f, 0.0f }, 0.1f);
-  //physSolver::newPhysObj({ -0.75, 0.0f }, 0.15f);
+  renderer::rectangleRounded exRectangleRounded;
+  exRectangleRounded.wallsX = { -0.50f, -0.25f };
+  exRectangleRounded.wallsY = {  0.75f,  1.0f  };
+  exRectangleRounded.radius = 0.05f;
+  
+  renderer::rectangleBordered exRectangleBordered;
+  exRectangleBordered.wallsX = { -0.25, 0.0f };
+  exRectangleBordered.wallsY = {  0.75, 1.0f };
+  exRectangleBordered.borderWidth = 0.03f;
 
   renderer::init();
 
@@ -104,13 +128,7 @@ int main() {
   // uncomment this call to draw in wireframe polygons.
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  double oldTime = glfwGetTime();
-  double newTime = glfwGetTime();
-
   while (!glfwWindowShouldClose(window)) {
-
-    newTime = glfwGetTime();
-    double deltaTime = ( newTime - oldTime ) * 1.0f;
 
     processInput(window);
 
@@ -120,22 +138,22 @@ int main() {
       (sin(glfwGetTime() + (3.14f / 3 * 2)) + 1.0f) / 2.0f, // green
       (sin(glfwGetTime() + (3.14f / 3 * 1)) + 1.0f) / 2.0f, // blue
       */
-      0.80f, 0.40, 0.20, 1.0f);
+      0.80f, 0.40, 0.20, 0.5f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ourShader.use();
 
 
+    //render::rectangle(background, black);
 
-    if (newTime > 5) {
-      physSolver::update(deltaTime);
-    }
+    render::circle(exCircle, red);
 
-    //physSolver::objects[0].origin[1] = physSolver::objects[0].origin[1] + ;
+    render::rectangle(exRectangle, green);
+	
+    render::rectangle::rounded(exRectangleRounded, blue);
 
+    render::rectangleBordered(exRectangleBordered, white, red);
 
-
-    physSolver::renderObjects();
 
     // Modes (Swap out the first object given to glDrawElements
     /*
@@ -150,8 +168,6 @@ int main() {
     */
     glfwSwapBuffers(window);
     glfwPollEvents();
-
-    oldTime = newTime;
   }
 
 
