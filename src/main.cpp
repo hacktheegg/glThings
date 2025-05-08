@@ -100,27 +100,17 @@ int main() {
   white.rgb = { 1.0f, 1.0f, 1.0f };
 
 
-  renderer::rectangle background;
-  background.wallsX = { -1.0f, 1.0f };
-  background.wallsY = { -1.0f, 1.0f };
+  renderer::standard::rectangle background({ -1.0f, 1.0f }, { -1.0f, 1.0f });
 
-  renderer::circle exCircle;
-  exCircle.origin = { -0.875f, 0.875f };
-  exCircle.radius = 0.125f;
+  renderer::standard::circle exCircle({ -0.875f, 0.875f }, 0.125f);
 
-  renderer::rectangle exRectangle;
-  exRectangle.wallsX = { -0.75f, -0.5f };
-  exRectangle.wallsY = {  0.75f,  1.0f };
+  renderer::standard::rectangle exRectangle ({ -0.75f, -0.5f }, { 0.75f, 1.0f });
   
-  renderer::rectangleRounded exRectangleRounded;
-  exRectangleRounded.wallsX = { -0.50f, -0.25f };
-  exRectangleRounded.wallsY = {  0.75f,  1.0f  };
-  exRectangleRounded.radius = 0.05f;
+  renderer::rectangle::rounded exRectangleRounded({ -0.50f, -0.25f }, {  0.75f,  1.0f  }, 0.1f);
   
-  renderer::rectangleBordered exRectangleBordered;
-  exRectangleBordered.wallsX = { -0.25, 0.0f };
-  exRectangleBordered.wallsY = {  0.75, 1.0f };
-  exRectangleBordered.borderWidth = 0.03f;
+  renderer::rectangle::bordered exRectangleBordered({ -0.25, 0.0f }, {  0.75, 1.0f }, 0.02f);
+
+  renderer::rectangle::roundBordered exRectangleRoundBordered({ -0.75, 0.75f }, { -0.75, 0.75f }, 0.1, 0.02f);
 
   renderer::init();
 
@@ -146,13 +136,15 @@ int main() {
 
     //render::rectangle(background, black);
 
-    render::circle(exCircle, red);
+    render::standard::circle(exCircle, red);
 
-    render::rectangle(exRectangle, green);
+    render::standard::rectangle(exRectangle, green);
 	
     render::rectangle::rounded(exRectangleRounded, blue);
 
-    render::rectangleBordered(exRectangleBordered, white, red);
+    render::rectangle::bordered(exRectangleBordered, white, red);
+
+    render::rectangle::roundBordered(exRectangleRoundBordered, white, green);
 
 
     // Modes (Swap out the first object given to glDrawElements
