@@ -29,14 +29,13 @@ namespace standard {
       wallsX = inputWallsX; wallsY = inputWallsY;
     }
   };
-  /*struct line {
-    std::vector<float> wallsX;
-    std::vector<float> wallsY;
-    line() { wallsX = { -0.25f, 0.25f }; wallsY = { -0.25f, 0.25f }; }
-    line(std::vector<float> inputWallsX, std::vector<float> inputWallsY) {
-      wallsX = inputWallsX; wallsY = inputWallsY;
+  struct line {
+    std::vector<std::vector<float>> points;
+    line() { points = {{ -0.25f, -0.25f }, { 0.0f, 0.5f }, { 0.25f, 0.25f }}; }
+    line(std::vector<std::vector<float>> inputPoints) {
+      points = inputPoints;
     }
-  };*/
+  };
 }
 
 namespace rectangle {
@@ -97,6 +96,9 @@ static void init() {
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 }
 
 static void addPoint(float *points, int counter,
@@ -110,7 +112,7 @@ static void addPoint(float *points, int counter,
   points[(counter*8)+4] = colour.rgb[0];
   points[(counter*8)+5] = colour.rgb[1];
   points[(counter*8)+6] = colour.rgb[2];
-  points[(counter*8)+7] = 1.0f;
+  points[(counter*8)+7] = colour.alpha;
 }
 
 }
@@ -174,28 +176,59 @@ class standard {
     delete [] points;
 
   }
-};
+  /*
+  static void line(renderer::standard::line object, renderer::colour colour) {
+
+    int pointCount = object.points.size() * 2;
+    float* points = new float[pointCount*8];
+
+    int counter = 0;
+
+    for (int i = 0; i < 4; i++) {
+
+      addPoint(
+        points, counter,
+        object.wallsX[((i+0)/2)%2],
+        object.wallsY[((i+1)/2)%2],
+        0.0f, 1.0f, colour
+      );
+
+      counter++;
+    }
+    
+
+    glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, pointCount);
+
+    delete [] points;
+
+  }
+  */
+  };
 
 class rectangle {
   public:
   static void rounded(renderer::rectangle::rounded object, renderer::colour colour) {
 
-    int pointCount = 4*12;
+    int pointCount = (4*12)+4;
     float* points = new float[pointCount*8];
     int counter = 0;
+    int counterOffset = 0;
 
     for (int i = 0; i < 4; i++) {
+
+      int xIndex = ((i+3)/2)%2;
+      int yIndex = ((i+2)/2)%2;
+
+      float wallsXRadiusModifier;
+      float wallsYRadiusModifier;
+      if (xIndex == 0) { wallsXRadiusModifier = object.radius; } else { wallsXRadiusModifier = -object.radius; }
+      if (yIndex == 0) { wallsYRadiusModifier = object.radius; } else { wallsYRadiusModifier = -object.radius; }
+
       for (int j = 0; j < pointCount/4; j++) {
 
         float angle = ((float)(((float)pointCount/4)*i+j)/pointCount)*360;
-
-        float wallsXRadiusModifier;
-        if (((i+3)/2)%2 == 0) { wallsXRadiusModifier = object.radius; }
-        if (((i+3)/2)%2 == 1) { wallsXRadiusModifier = -object.radius; }
-
-        float wallsYRadiusModifier;
-        if (((i+2)/2)%2 == 0) { wallsYRadiusModifier = object.radius; }
-        if (((i+2)/2)%2 == 1) { wallsYRadiusModifier = -object.radius; }
 
         addPoint(
           points, counter,
@@ -270,45 +303,41 @@ class rectangle {
     const renderer::colour colourInternal, const renderer::colour colourBorder
   ) {
 
-    int pointCount = 4*12;
+    int pointCount = (4*12)+4;
     float* pointsInternal = new float[pointCount*8];
     float* pointsExternal = new float[pointCount*8];
     int counter = 0;
+    int counterOffset = 0;
 
     for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < pointCount/4; j++) {
-
-        float angle = ((float)(((float)pointCount/4)*i+j)/pointCount)*360;
         
-        int xIndex = ((i+3)/2)%2;
-        int yIndex = ((i+2)/2)%2;
+      int xIndex = ((i+3)/2)%2;
+      int yIndex = ((i+2)/2)%2;
 
-        float wallsXRadiusModifier;
-        if (xIndex == 0) { wallsXRadiusModifier = object.radius; }
-        if (xIndex == 1) { wallsXRadiusModifier = -object.radius; }
+      float wallsXRadiusModifier;
+      float wallsYRadiusModifier;
+      if (xIndex == 0) { wallsXRadiusModifier = object.radius; } else { wallsXRadiusModifier = -object.radius; }
+      if (yIndex == 0) { wallsYRadiusModifier = object.radius; } else { wallsYRadiusModifier = -object.radius; }
 
-        float wallsYRadiusModifier;
-        if (yIndex == 0) { wallsYRadiusModifier = object.radius; }
-        if (yIndex == 1) { wallsYRadiusModifier = -object.radius; }
+      float wallsXBorderModifier;
+      float wallsYBorderModifier;
+      if (xIndex == 0) { wallsXBorderModifier = object.borderWidth; } else { wallsXBorderModifier = -object.borderWidth; }
+      if (yIndex == 0) { wallsYBorderModifier = object.borderWidth; } else { wallsYBorderModifier = -object.borderWidth; }
+
+      for (int j = 0; j < (pointCount-4)/4; j++) {
+
+        float angle = ((float)(((float)(pointCount-4)/4)*i+j)/(pointCount-4))*360;
+
 
         addPoint(
-          pointsExternal, counter,
+          pointsExternal, counter+counterOffset,
           (cos((angle/180)*M_PI)*object.radius)+object.wallsX[xIndex]+wallsXRadiusModifier,
           (sin((angle/180)*M_PI)*object.radius)+object.wallsY[yIndex]+wallsYRadiusModifier,
           0.0f, 1.0f, colourBorder
         );
-        
-        
-        float wallsXBorderModifier;
-        if (xIndex == 0) { wallsXBorderModifier = object.borderWidth; }
-        if (xIndex == 1) { wallsXBorderModifier = -object.borderWidth; }
 
-        float wallsYBorderModifier;
-        if (yIndex == 0) { wallsYBorderModifier = object.borderWidth; }
-        if (yIndex == 1) { wallsYBorderModifier = -object.borderWidth; }
-        
         addPoint(
-          pointsInternal, counter,
+          pointsInternal, counter+counterOffset,
           (cos((angle/180)*M_PI)*(object.radius-object.borderWidth))
             +object.wallsX[xIndex]+wallsXRadiusModifier+wallsXBorderModifier,
           (sin((angle/180)*M_PI)*(object.radius-object.borderWidth))
@@ -319,6 +348,26 @@ class rectangle {
 
         counter++;
       }
+
+      float allignmentAngle = ((float)(((float)(pointCount-4)/4)*i+((float)(pointCount-4)/4))/(pointCount-4))*360;
+
+      addPoint(
+        pointsExternal, counter+counterOffset,
+        (cos((allignmentAngle/180)*M_PI)*object.radius)+object.wallsX[xIndex]+wallsXRadiusModifier,
+        (sin((allignmentAngle/180)*M_PI)*object.radius)+object.wallsY[yIndex]+wallsYRadiusModifier,
+        0.0f, 1.0f, colourBorder
+      );
+
+      addPoint(
+        pointsInternal, counter+counterOffset,
+        (cos((allignmentAngle/180)*M_PI)*(object.radius-object.borderWidth))
+          +object.wallsX[xIndex]+wallsXRadiusModifier+wallsXBorderModifier,
+        (sin((allignmentAngle/180)*M_PI)*(object.radius-object.borderWidth))
+          +object.wallsY[yIndex]+wallsYRadiusModifier+wallsYBorderModifier,
+        0.0f, 1.0f, colourInternal
+      );
+
+      counterOffset++;
 
     }
 

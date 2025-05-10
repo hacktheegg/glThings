@@ -87,20 +87,12 @@ int main() {
   //// SHADERS ////
   Shader ourShader("./shader.vert", "./shader.frag");
 
-  renderer::colour black;
-  renderer::colour red;
-  renderer::colour green;
-  renderer::colour blue;
-  renderer::colour white;
+  renderer::colour black ({ 0.1f, 0.1f, 0.1f });
+  renderer::colour red   ({ 0.9f, 0.1f, 0.1f }, 0.5f);
+  renderer::colour green ({ 0.1f, 0.9f, 0.1f }, 0.5f);
+  renderer::colour blue  ({ 0.1f, 0.1f, 0.9f }, 0.5f);
+  renderer::colour white ({ 0.9f, 0.9f, 0.9f }, 1.0f);
 
-  black.rgb = { 0.0f, 0.0f, 0.0f };
-  red.rgb =   { 1.0f, 0.0f, 0.0f };
-  green.rgb = { 0.0f, 1.0f, 0.0f };
-  blue.rgb =  { 0.0f, 0.0f, 1.0f };
-  white.rgb = { 1.0f, 1.0f, 1.0f };
-
-
-  renderer::standard::rectangle background({ -1.0f, 1.0f }, { -1.0f, 1.0f });
 
   renderer::standard::circle exCircle({ -0.875f, 0.875f }, 0.125f);
 
@@ -110,7 +102,7 @@ int main() {
   
   renderer::rectangle::bordered exRectangleBordered({ -0.25, 0.0f }, {  0.75, 1.0f }, 0.02f);
 
-  renderer::rectangle::roundBordered exRectangleRoundBordered({ -0.75, 0.75f }, { -0.75, 0.75f }, 0.1, 0.02f);
+  renderer::rectangle::roundBordered exRectangleRoundBordered({ -1.0f, 1.0f }, { -1.0f, 1.0f }, 0.125f, 0.02f);
 
   renderer::init();
 
@@ -128,23 +120,21 @@ int main() {
       (sin(glfwGetTime() + (3.14f / 3 * 2)) + 1.0f) / 2.0f, // green
       (sin(glfwGetTime() + (3.14f / 3 * 1)) + 1.0f) / 2.0f, // blue
       */
-      0.80f, 0.40, 0.20, 0.5f);
+      0.00f, 0.00f, 0.00f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ourShader.use();
 
 
-    //render::rectangle(background, black);
+   render::rectangle::roundBordered(exRectangleRoundBordered, white, green);
 
     render::standard::circle(exCircle, red);
 
     render::standard::rectangle(exRectangle, green);
-	
+
     render::rectangle::rounded(exRectangleRounded, blue);
 
     render::rectangle::bordered(exRectangleBordered, white, red);
-
-    render::rectangle::roundBordered(exRectangleRoundBordered, white, green);
 
 
     // Modes (Swap out the first object given to glDrawElements
