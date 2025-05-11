@@ -80,7 +80,32 @@ struct colour {
   colour(std::vector<float> inputRgb, float inputAlpha) { rgb = inputRgb; alpha = inputAlpha; }
 };
 
-unsigned int VertexArrayObject, VertexBufferObject;
+static void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+
+  // Calculate aspect ratios
+  float window_aspect = static_cast<float>(width) / height;
+  float target_aspect = 1.0f; // Square aspect ratio
+
+  // Determine the limiting dimension
+  float viewport_width, viewport_height;
+  if (window_aspect > target_aspect) {
+    // Window is wider than our target square
+    viewport_width = height * target_aspect;
+    viewport_height = height;
+  } else {
+    // Window is taller than our target square
+    viewport_width = width;
+    viewport_height = width / target_aspect;
+  }
+
+  // Center the viewport
+  int viewport_x = (width - viewport_width) / 2;
+  int viewport_y = (height - viewport_height) / 2;
+
+  glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
+}
+
+static unsigned int VertexArrayObject, VertexBufferObject;
 
 static void init() {
 
@@ -96,8 +121,8 @@ static void init() {
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 }
 
@@ -176,35 +201,30 @@ class standard {
     delete [] points;
 
   }
-  /*
   static void line(renderer::standard::line object, renderer::colour colour) {
 
-    int pointCount = object.points.size() * 2;
+    int pointCount = object.points.size();
     float* points = new float[pointCount*8];
 
-    int counter = 0;
-
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < pointCount; i++) {
 
       addPoint(
-        points, counter,
-        object.wallsX[((i+0)/2)%2],
-        object.wallsY[((i+1)/2)%2],
+        points, i,
+        object.points[i][0],
+        object.points[i][1],
         0.0f, 1.0f, colour
       );
 
-      counter++;
     }
     
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, pointCount);
+    glDrawArrays(GL_LINES, 0, pointCount);
 
     delete [] points;
 
   }
-  */
   };
 
 class rectangle {
