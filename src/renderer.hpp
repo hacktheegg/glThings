@@ -10,7 +10,7 @@
 
 #define M_PI 3.141592653589f
 
-
+GLFWwindow exwindow = nullptr;
 
 
 
@@ -142,11 +142,16 @@ static void addPoint(float *points, int counter,
   points[(counter*8)+7] = colour.alpha;
 }
 
-static std::vector<int> getWindowDimensions(GLFWwindow *window) {
+
+void getWindowHandle(GLFWwindow windowHandle) {
+  exwindow = windowHandle;
+}
+
+static std::vector<int> getWindowDimensions() {
 
   std::vector<int> dimensions = { 0, 0 };
 
-  glfwGetWindowSize(window, &dimensions[0], &dimensions[1]);
+  glfwGetWindowSize(exwindow, &dimensions[0], &dimensions[1]);
 
   return dimensions;
 
