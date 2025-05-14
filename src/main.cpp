@@ -116,7 +116,7 @@ int main() {
 
   for (float i = -1.0f; i <= 1.0f; i+=0.01f) {
 
-    points.push_back({i, (float)sin(i*M_PI)});
+    points.push_back({i*2, (float)sin(i*M_PI)});
 
   }
 
@@ -132,7 +132,7 @@ int main() {
 
   while (!glfwWindowShouldClose(window)) {
 
-    std::cout << renderer::getWindowDimensions()[0] << std::endl;
+    //std::cout << renderer::getWindowDimensions()[0] << std::endl;
 
     processInput(window);
 

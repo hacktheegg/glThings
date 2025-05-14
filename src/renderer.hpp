@@ -10,11 +10,13 @@
 
 #define M_PI 3.141592653589f
 
-GLFWwindow* exwindow = nullptr;
 
 
 
 namespace renderer {
+
+static GLFWwindow* exwindow = nullptr;
+static std::vector<float> posMultiplier = { 1.0f, 1.0f };
 
 namespace standard {
   struct circle {
@@ -84,27 +86,15 @@ struct colour {
 
 static void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
-  // Calculate aspect ratios
-  float window_aspect = static_cast<float>(width) / height;
-  float target_aspect = 1.0f; // Square aspect ratio
-
-  // Determine the limiting dimension
-  float viewport_width, viewport_height;
-  if (window_aspect > target_aspect) {
-    // Window is wider than our target square
-    viewport_width = height * target_aspect;
-    viewport_height = height;
+  if (width < height) {
+    posMultiplier[0] = 1.0f;
+    posMultiplier[1] = (float)width/height;
   } else {
-    // Window is taller than our target square
-    viewport_width = width;
-    viewport_height = width / target_aspect;
+    posMultiplier[0] = (float)height/width;
+    posMultiplier[1] = 1.0f;
   }
 
-  // Center the viewport
-  int viewport_x = (width - viewport_width) / 2;
-  int viewport_y = (height - viewport_height) / 2;
-
-  glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
+  glViewport(0, 0, width, height);
 }
 
 static unsigned int VertexArrayObject, VertexBufferObject;
@@ -132,8 +122,8 @@ static void addPoint(float *points, int counter,
   float p1, float p2, float p3, float p4,
   renderer::colour colour
 ) {
-  points[(counter*8)+0] = p1;
-  points[(counter*8)+1] = p2;
+  points[(counter*8)+0] = posMultiplier[0]*(p1);
+  points[(counter*8)+1] = posMultiplier[1]*(p2);
   points[(counter*8)+2] = p3;
   points[(counter*8)+3] = p4;
   points[(counter*8)+4] = colour.rgb[0];
