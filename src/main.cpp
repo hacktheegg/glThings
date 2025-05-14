@@ -124,13 +124,15 @@ int main() {
 
   renderer::init();
 
+  renderer::getWindowHandle(window);
+
 
   // uncomment this call to draw in wireframe polygons.
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while (!glfwWindowShouldClose(window)) {
 
-    std::cout << renderer::getWindowDimensions(window)[0] << std::endl;
+    std::cout << renderer::getWindowDimensions()[0] << std::endl;
 
     processInput(window);
 

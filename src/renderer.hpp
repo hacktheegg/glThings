@@ -10,7 +10,7 @@
 
 #define M_PI 3.141592653589f
 
-GLFWwindow exwindow = nullptr;
+GLFWwindow* exwindow = nullptr;
 
 
 
@@ -143,7 +143,7 @@ static void addPoint(float *points, int counter,
 }
 
 
-void getWindowHandle(GLFWwindow windowHandle) {
+void getWindowHandle(GLFWwindow* windowHandle) {
   exwindow = windowHandle;
 }
 
