@@ -8,6 +8,8 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 
+#define M_PI 3.141592653589f
+
 
 
 
@@ -140,6 +142,16 @@ static void addPoint(float *points, int counter,
   points[(counter*8)+7] = colour.alpha;
 }
 
+static std::vector<int> getWindowDimensions(GLFWwindow *window) {
+
+  std::vector<int> dimensions = { 0, 0 };
+
+  glfwGetWindowSize(window, &dimensions[0], &dimensions[1]);
+
+  return dimensions;
+
+}
+
 }
 
 
@@ -157,7 +169,7 @@ class standard {
 
       float angle = ((float)counter/pointCount)*360;
 
-      addPoint(
+      renderer::addPoint(
         points, counter,
         (cos((angle/180)*M_PI)*object.radius)+object.origin[0],
         (sin((angle/180)*M_PI)*object.radius)+object.origin[1],

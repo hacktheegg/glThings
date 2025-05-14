@@ -90,11 +90,11 @@ int main() {
   renderer::colour blue  ({ 0.0f, 0.0f, 1.0f }, 1.0f);
   renderer::colour white ({ 1.0f, 1.0f, 1.0f }, 1.0f);
 
-  //renderer::standard::circle exCircle({ -0.875f, 0.875f }, 0.125f);
-  //renderer::standard::rectangle exRectangle({ -0.75f, -0.5f }, { 0.75f, 1.0f });
+  renderer::standard::circle exCircle({ -0.875f, 0.875f }, 0.125f);
+  renderer::standard::rectangle exRectangle({ -0.75f, -0.5f }, { 0.75f, 1.0f });
 
-  //renderer::rectangle::rounded exRectangleRounded({ -0.50f, -0.25f }, {  0.75f,  1.0f  }, 0.1f);
-  //renderer::rectangle::bordered exRectangleBordered({ -0.25, 0.0f }, {  0.75, 1.0f }, 0.02f);
+  renderer::rectangle::rounded exRectangleRounded({ -0.50f, -0.25f }, {  0.75f,  1.0f  }, 0.1f);
+  renderer::rectangle::bordered exRectangleBordered({ -0.25, 0.0f }, {  0.75, 1.0f }, 0.02f);
   renderer::rectangle::roundBordered exRectangleRoundBordered({ -1.0f, 1.0f }, { -1.0f, 1.0f }, 0.125f, 0.02f);
 
   float dist = 1.0f/3.0f;
@@ -130,6 +130,8 @@ int main() {
 
   while (!glfwWindowShouldClose(window)) {
 
+    std::cout << renderer::getWindowDimensions(window)[0] << std::endl;
+
     processInput(window);
 
     //renderer::
@@ -146,11 +148,11 @@ int main() {
     ourShader.use();
 
 
-    //render::rectangle::roundBordered(exRectangleRoundBordered, white, green);
-    //render::standard::circle(exCircle, red);
-    //render::standard::rectangle(exRectangle, green);
-    //render::rectangle::rounded(exRectangleRounded, blue);
-    //render::rectangle::bordered(exRectangleBordered, white, red);
+    render::rectangle::roundBordered(exRectangleRoundBordered, black, green);
+    render::standard::circle(exCircle, red);
+    render::standard::rectangle(exRectangle, green);
+    render::rectangle::rounded(exRectangleRounded, blue);
+    render::rectangle::bordered(exRectangleBordered, white, red);
     render::standard::line(line, green);
 
     //render::standard::circle(circle1, red);
