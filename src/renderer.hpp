@@ -17,6 +17,7 @@ namespace renderer {
 
 static GLFWwindow* exwindow = nullptr;
 static std::vector<float> posMultiplier = { 1.0f, 1.0f };
+static float desiredScreenRatio = 1.0f;
 
 namespace standard {
   struct circle {
@@ -86,12 +87,22 @@ struct colour {
 
 static void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
-  if (width < height) {
-    posMultiplier[0] = 1.0f;
+  /*
+  if (width*desiredScreenRatio < height) {
+    posMultiplier[0] = 1.0f*desiredScreenRatio;
     posMultiplier[1] = (float)width/height;
   } else {
-    posMultiplier[0] = (float)height/width;
+    posMultiplier[0] = (float)height/width*desiredScreenRatio;
     posMultiplier[1] = 1.0f;
+  }
+  */
+
+  if ((float)width > (float)height*desiredScreenRatio) {
+    posMultiplier[0] = (float)(height*desiredScreenRatio)/width;
+    posMultiplier[1] = 1.0f;
+  } else {
+    posMultiplier[0] = 1.0f;
+    posMultiplier[1] = (float)width/((float)height*desiredScreenRatio);
   }
 
   glViewport(0, 0, width, height);
@@ -133,7 +144,7 @@ static void addPoint(float *points, int counter,
 }
 
 
-void getWindowHandle(GLFWwindow* windowHandle) {
+static void getWindowHandle(GLFWwindow* windowHandle) {
   exwindow = windowHandle;
 }
 
@@ -166,7 +177,7 @@ class standard {
 
       renderer::addPoint(
         points, counter,
-        (cos((angle/180)*M_PI)*object.radius)+object.origin[0],
+        ((cos((angle/180)*M_PI)*object.radius/renderer::desiredScreenRatio)+object.origin[0]),
         (sin((angle/180)*M_PI)*object.radius)+object.origin[1],
         0.0f, 1.0f, colour
       );
@@ -259,7 +270,7 @@ class rectangle {
 
         addPoint(
           points, counter,
-          (cos((angle/180)*M_PI)*object.radius)+object.wallsX[((i+3)/2)%2]+wallsXRadiusModifier,
+          (cos((angle/180)*M_PI)*object.radius/renderer::desiredScreenRatio)+object.wallsX[((i+3)/2)%2]+wallsXRadiusModifier,
           (sin((angle/180)*M_PI)*object.radius)+object.wallsY[((i+2)/2)%2]+wallsYRadiusModifier,
           0.0f, 1.0f, colour
         );
@@ -358,14 +369,14 @@ class rectangle {
 
         addPoint(
           pointsExternal, counter+counterOffset,
-          (cos((angle/180)*M_PI)*object.radius)+object.wallsX[xIndex]+wallsXRadiusModifier,
+          (cos((angle/180)*M_PI)*object.radius/renderer::desiredScreenRatio)+object.wallsX[xIndex]+wallsXRadiusModifier,
           (sin((angle/180)*M_PI)*object.radius)+object.wallsY[yIndex]+wallsYRadiusModifier,
           0.0f, 1.0f, colourBorder
         );
 
         addPoint(
           pointsInternal, counter+counterOffset,
-          (cos((angle/180)*M_PI)*(object.radius-object.borderWidth))
+          (cos((angle/180)*M_PI)*(object.radius-object.borderWidth)/renderer::desiredScreenRatio)
             +object.wallsX[xIndex]+wallsXRadiusModifier+wallsXBorderModifier,
           (sin((angle/180)*M_PI)*(object.radius-object.borderWidth))
             +object.wallsY[yIndex]+wallsYRadiusModifier+wallsYBorderModifier,
@@ -380,14 +391,14 @@ class rectangle {
 
       addPoint(
         pointsExternal, counter+counterOffset,
-        (cos((allignmentAngle/180)*M_PI)*object.radius)+object.wallsX[xIndex]+wallsXRadiusModifier,
+        (cos((allignmentAngle/180)*M_PI)*object.radius/renderer::desiredScreenRatio)+object.wallsX[xIndex]+wallsXRadiusModifier,
         (sin((allignmentAngle/180)*M_PI)*object.radius)+object.wallsY[yIndex]+wallsYRadiusModifier,
         0.0f, 1.0f, colourBorder
       );
 
       addPoint(
         pointsInternal, counter+counterOffset,
-        (cos((allignmentAngle/180)*M_PI)*(object.radius-object.borderWidth))
+        (cos((allignmentAngle/180)*M_PI)*(object.radius-object.borderWidth)/renderer::desiredScreenRatio)
           +object.wallsX[xIndex]+wallsXRadiusModifier+wallsXBorderModifier,
         (sin((allignmentAngle/180)*M_PI)*(object.radius-object.borderWidth))
           +object.wallsY[yIndex]+wallsYRadiusModifier+wallsYBorderModifier,

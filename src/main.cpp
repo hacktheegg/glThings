@@ -136,7 +136,11 @@ int main() {
 
     processInput(window);
 
-    //renderer::
+
+    std::vector<int> screenWidthHeight = renderer::getWindowDimensions();
+
+    renderer::framebuffer_size_callback(window, screenWidthHeight[0], screenWidthHeight[1]);
+
 
     glClearColor(
       /*
@@ -144,7 +148,7 @@ int main() {
       (sin(glfwGetTime() + (3.14f / 3 * 2)) + 1.0f) / 2.0f, // green
       (sin(glfwGetTime() + (3.14f / 3 * 1)) + 1.0f) / 2.0f, // blue
       */
-      0.00f, 0.00f, 0.00f, 0.0f);
+      0.10f, 0.10f, 0.10f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ourShader.use();
@@ -156,6 +160,9 @@ int main() {
     render::rectangle::rounded(exRectangleRounded, blue);
     render::rectangle::bordered(exRectangleBordered, white, red);
     render::standard::line(line, green);
+
+
+    //renderer::desiredScreenRatio = sin(glfwGetTime() + (3.14f / 3 * 3)) + 1.0f;
 
     //render::standard::circle(circle1, red);
     //render::standard::circle(circle2, green);
