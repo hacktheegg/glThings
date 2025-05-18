@@ -22,35 +22,6 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
-  /*
-  if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !clickState) {
-    clickState = true;
-    double xpos = 0.0;
-    double ypos = 0.0;
-    glfwGetCursorPos(window, &xpos, &ypos);
-    physSolver::newPhysObj(
-      {
-        ((float)xpos/windowWidth*2)-1.0f,
-        -(((float)ypos/windowHeight*2)-1.0f)
-      },
-      0.02f
-    );
-  } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
-    clickState = false;
-  }
-  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-    double xpos = 0.0;
-    double ypos = 0.0;
-    glfwGetCursorPos(window, &xpos, &ypos);
-    physSolver::newPhysObj(
-      {
-        ((float)xpos/windowWidth*2)-1.0f,
-        -(((float)ypos/windowHeight*2)-1.0f)
-      },
-      0.02f
-    );
-  }
-  */
 }
 
 int main() {
@@ -88,6 +59,9 @@ int main() {
   renderer::colour red   ({ 1.0f, 0.0f, 0.0f }, 1.0f);
   renderer::colour green ({ 0.0f, 1.0f, 0.0f }, 1.0f);
   renderer::colour blue  ({ 0.0f, 0.0f, 1.0f }, 1.0f);
+  renderer::colour circleRed   ({ 1.0f, 0.0f, 0.0f }, 0.3f);
+  renderer::colour circleGreen ({ 0.0f, 1.0f, 0.0f }, 0.3f);
+  renderer::colour circleBlue  ({ 0.0f, 0.0f, 1.0f }, 0.3f);
   renderer::colour white ({ 1.0f, 1.0f, 1.0f }, 1.0f);
 
   renderer::standard::circle exCircle({ -0.875f, 0.875f }, 0.125f);
@@ -162,11 +136,11 @@ int main() {
     render::standard::line(line, green);
 
 
-    //renderer::desiredScreenRatio = sin(glfwGetTime() + (3.14f / 3 * 3)) + 1.0f;
+    renderer::desiredScreenRatio = ( sin( ( glfwGetTime() / 10 ) * M_PI * 2 ) + 1.0f ) * 4;
 
-    //render::standard::circle(circle1, red);
-    //render::standard::circle(circle2, green);
-    //render::standard::circle(circle3, blue);
+    render::standard::circle(circle1, circleRed);
+    render::standard::circle(circle2, circleGreen);
+    render::standard::circle(circle3, circleBlue);
 
 
     // Modes (Swap out the first object given to glDrawElements

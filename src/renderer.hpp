@@ -124,8 +124,8 @@ static void init() {
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 }
 
@@ -311,7 +311,7 @@ class rectangle {
 
       addPoint(
         pointsInternal, counter,
-        object.wallsX[((i+0)/2)%2]+wallsXBorderModifier,
+        object.wallsX[((i+0)/2)%2]+wallsXBorderModifier/renderer::desiredScreenRatio,
         object.wallsY[((i+1)/2)%2]+wallsYBorderModifier,
         0.0f, 1.0f, colourBorder
       );
@@ -377,7 +377,7 @@ class rectangle {
         addPoint(
           pointsInternal, counter+counterOffset,
           (cos((angle/180)*M_PI)*(object.radius-object.borderWidth)/renderer::desiredScreenRatio)
-            +object.wallsX[xIndex]+wallsXRadiusModifier+wallsXBorderModifier,
+            +object.wallsX[xIndex]+wallsXRadiusModifier+wallsXBorderModifier/renderer::desiredScreenRatio,
           (sin((angle/180)*M_PI)*(object.radius-object.borderWidth))
             +object.wallsY[yIndex]+wallsYRadiusModifier+wallsYBorderModifier,
           0.0f, 1.0f, colourInternal
@@ -399,7 +399,7 @@ class rectangle {
       addPoint(
         pointsInternal, counter+counterOffset,
         (cos((allignmentAngle/180)*M_PI)*(object.radius-object.borderWidth)/renderer::desiredScreenRatio)
-          +object.wallsX[xIndex]+wallsXRadiusModifier+wallsXBorderModifier,
+          +object.wallsX[xIndex]+wallsXRadiusModifier+wallsXBorderModifier/renderer::desiredScreenRatio,
         (sin((allignmentAngle/180)*M_PI)*(object.radius-object.borderWidth))
           +object.wallsY[yIndex]+wallsYRadiusModifier+wallsYBorderModifier,
         0.0f, 1.0f, colourInternal
