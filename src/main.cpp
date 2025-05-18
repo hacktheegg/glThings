@@ -27,42 +27,12 @@ void processInput(GLFWwindow *window) {
 int main() {
   std::cout << "Hello, World!" << std::endl;
 
-  // initialise GLFW
-  glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-  // initialise GLFW window
-  GLFWwindow *window = glfwCreateWindow(windowWidth, windowHeight, "glThings", NULL, NULL);
-  if (window == NULL) {
-    std::cout << "Failed to create GLFW window" << std::endl;
-    glfwTerminate();
-    return -1;
-  }
-  glfwMakeContextCurrent(window);
-  glfwSetFramebufferSizeCallback(window, renderer::framebuffer_size_callback);
-  // initialise GLAD function pointers
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cout << "Failed to initialize GLAD" << std::endl;
-    return -1;
-  }
 
+  GLFWwindow *window = renderer::init(windowWidth, windowHeight, 1.0f);
 
 
   //// SHADERS ////
   Shader ourShader("./shader.vert", "./shader.frag");
-
-  renderer::colour black ({ 0.0f, 0.0f, 0.0f });
-  renderer::colour red   ({ 1.0f, 0.0f, 0.0f }, 1.0f);
-  renderer::colour green ({ 0.0f, 1.0f, 0.0f }, 1.0f);
-  renderer::colour blue  ({ 0.0f, 0.0f, 1.0f }, 1.0f);
-  renderer::colour circleRed   ({ 1.0f, 0.0f, 0.0f }, 0.3f);
-  renderer::colour circleGreen ({ 0.0f, 1.0f, 0.0f }, 0.3f);
-  renderer::colour circleBlue  ({ 0.0f, 0.0f, 1.0f }, 0.3f);
-  renderer::colour white ({ 1.0f, 1.0f, 1.0f }, 1.0f);
 
   renderer::standard::circle exCircle({ -0.875f, 0.875f }, 0.125f);
   renderer::standard::rectangle exRectangle({ -0.75f, -0.5f }, { 0.75f, 1.0f });
@@ -96,8 +66,6 @@ int main() {
 
   renderer::standard::line line(points);
 
-  renderer::init();
-
   renderer::getWindowHandle(window);
 
 
@@ -128,19 +96,19 @@ int main() {
     ourShader.use();
 
 
-    render::rectangle::roundBordered(exRectangleRoundBordered, black, green);
-    render::standard::circle(exCircle, red);
-    render::standard::rectangle(exRectangle, green);
-    render::rectangle::rounded(exRectangleRounded, blue);
-    render::rectangle::bordered(exRectangleBordered, white, red);
-    render::standard::line(line, green);
+    render::rectangle::roundBordered(exRectangleRoundBordered, renderer::colour({0,0,0}), renderer::colour({0,1,0}));
+    render::standard::circle(exCircle, renderer::colour({1,0,0}));
+    render::standard::rectangle(exRectangle, renderer::colour({0,1,0}));
+    render::rectangle::rounded(exRectangleRounded, renderer::colour({0,0,1}));
+    render::rectangle::bordered(exRectangleBordered, renderer::colour({1,1,1}), renderer::colour({1,0,0}));
+    render::standard::line(line, renderer::colour({0,1,0}));
 
 
     renderer::desiredScreenRatio = ( sin( ( glfwGetTime() / 10 ) * M_PI * 2 ) + 1.0f ) * 4;
 
-    render::standard::circle(circle1, circleRed);
-    render::standard::circle(circle2, circleGreen);
-    render::standard::circle(circle3, circleBlue);
+    render::standard::circle(circle1, renderer::colour({1,0,0},0.5));
+    render::standard::circle(circle2, renderer::colour({0,1,0},0.5));
+    render::standard::circle(circle3, renderer::colour({0,0,1},0.5));
 
 
     // Modes (Swap out the first object given to glDrawElements

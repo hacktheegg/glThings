@@ -85,50 +85,6 @@ struct colour {
   colour(std::vector<float> inputRgb, float inputAlpha) { rgb = inputRgb; alpha = inputAlpha; }
 };
 
-static void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-
-  /*
-  if (width*desiredScreenRatio < height) {
-    posMultiplier[0] = 1.0f*desiredScreenRatio;
-    posMultiplier[1] = (float)width/height;
-  } else {
-    posMultiplier[0] = (float)height/width*desiredScreenRatio;
-    posMultiplier[1] = 1.0f;
-  }
-  */
-
-  if ((float)width > (float)height*desiredScreenRatio) {
-    posMultiplier[0] = (float)(height*desiredScreenRatio)/width;
-    posMultiplier[1] = 1.0f;
-  } else {
-    posMultiplier[0] = 1.0f;
-    posMultiplier[1] = (float)width/((float)height*desiredScreenRatio);
-  }
-
-  glViewport(0, 0, width, height);
-}
-
-static unsigned int VertexArrayObject, VertexBufferObject;
-
-static void init() {
-
-    glGenBuffers(1, &VertexBufferObject);
-    glGenVertexArrays(1, &VertexArrayObject);
-
-    glBindVertexArray(VertexArrayObject);
-    glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
-
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-}
-
 static void addPoint(float *points, int counter,
   float p1, float p2, float p3, float p4,
   renderer::colour colour
@@ -144,9 +100,7 @@ static void addPoint(float *points, int counter,
 }
 
 
-static void getWindowHandle(GLFWwindow* windowHandle) {
-  exwindow = windowHandle;
-}
+static unsigned int VertexArrayObject, VertexBufferObject;
 
 static std::vector<int> getWindowDimensions() {
 
@@ -156,6 +110,64 @@ static std::vector<int> getWindowDimensions() {
 
   return dimensions;
 
+}
+
+static void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+
+  if ((float)width > (float)height*desiredScreenRatio) {
+    posMultiplier[0] = (float)(height*desiredScreenRatio)/width;
+    posMultiplier[1] = 1.0f;
+  } else {
+    posMultiplier[0] = 1.0f;
+    posMultiplier[1] = (float)width/((float)height*desiredScreenRatio);
+  }
+
+  glViewport(0, 0, width, height);
+}
+
+static void getWindowHandle(GLFWwindow* windowHandle) {
+  exwindow = windowHandle;
+}
+
+static GLFWwindow* init(int width, int height, float desiredscrRatio) {
+
+  // initialise GLFW
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+  // initialise GLFW window
+  GLFWwindow *window = glfwCreateWindow(width, height, "glThings", NULL, NULL);
+  if (window == NULL) {
+    glfwTerminate();
+    throw "Failed to create GLFW window";
+  }
+  glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, renderer::framebuffer_size_callback);
+  // initialise GLAD function pointers
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    throw "Failed to initialize GLAD";
+  }
+
+  glGenBuffers(1, &VertexBufferObject);
+  glGenVertexArrays(1, &VertexArrayObject);
+
+  glBindVertexArray(VertexArrayObject);
+  glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  return window;
 }
 
 }
