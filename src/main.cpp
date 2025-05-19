@@ -79,8 +79,9 @@ int main() {
     processInput(window);
 
 
-    //std::vector<int> screenWidthHeight = renderer::getWindowDimensions();
+    std::vector<int> screenWidthHeight = renderer::getWindowDimensions();
 
+    renderer::desiredScreenRatio = (float)screenWidthHeight[0]/screenWidthHeight[1];
     //renderer::framebuffer_size_callback(window, screenWidthHeight[0], screenWidthHeight[1]);
 
 

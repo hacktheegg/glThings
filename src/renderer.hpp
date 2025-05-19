@@ -273,23 +273,33 @@ class rectangle {
       if (xIndex == 0) { wallsXRadiusModifier = object.radius; } else { wallsXRadiusModifier = -object.radius; }
       if (yIndex == 0) { wallsYRadiusModifier = object.radius; } else { wallsYRadiusModifier = -object.radius; }
 
-      for (int j = 0; j < pointCount/4; j++) {
+      for (int j = 0; j < (pointCount-4)/4; j++) {
 
-        float angle = ((float)(((float)pointCount/4)*i+j)/pointCount)*360;
+        float angle = ((float)(((float)(pointCount-4)/4)*i+j)/(pointCount-4))*360;
 
         addPoint(
           points, counter,
-          (cos((angle/180)*M_PI)*object.radius/renderer::desiredScreenRatio)+object.wallsX[((i+3)/2)%2]+wallsXRadiusModifier/renderer::desiredScreenRatio,
-          (sin((angle/180)*M_PI)*object.radius)+object.wallsY[((i+2)/2)%2]+wallsYRadiusModifier,
+          cos((angle/180)*M_PI)*object.radius/renderer::desiredScreenRatio+object.wallsX[((i+3)/2)%2]+wallsXRadiusModifier/renderer::desiredScreenRatio,
+          sin((angle/180)*M_PI)*object.radius                             +object.wallsY[((i+2)/2)%2]+wallsYRadiusModifier,
           0.0f, 1.0f, colour
         );
 
         counter++;
       }
 
+      float allignmentAngle = ((float)(((float)(pointCount-4)/4)*i+((float)(pointCount-4)/4))/(pointCount-4))*360;
+
+      addPoint(
+        points, counter+counterOffset,
+        cos(allignmentAngle/180*M_PI)*object.radius/renderer::desiredScreenRatio+object.wallsX[xIndex]+wallsXRadiusModifier/renderer::desiredScreenRatio,
+        sin(allignmentAngle/180*M_PI)*object.radius                             +object.wallsY[yIndex]+wallsYRadiusModifier,
+        0.0f, 1.0f, colour
+      );
+
+      counter++;
+
     }
     
-
     glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
 
@@ -375,7 +385,6 @@ class rectangle {
 
         float angle = ((float)(((float)(pointCount-4)/4)*i+j)/(pointCount-4))*360;
 
-
         addPoint(
           pointsExternal, counter+counterOffset,
           cos(angle/180*M_PI)*object.radius/renderer::desiredScreenRatio+object.wallsX[xIndex]+wallsXRadiusModifier/renderer::desiredScreenRatio,
@@ -389,7 +398,6 @@ class rectangle {
           sin(angle/180*M_PI)*(object.radius-object.borderWidth)                             +object.wallsY[yIndex]+(wallsYBorderModifier+wallsYRadiusModifier),
           0.0f, 1.0f, colourInternal
         );
-
 
         counter++;
       }
