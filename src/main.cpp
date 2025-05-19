@@ -28,7 +28,7 @@ int main() {
   std::cout << "Hello, World!" << std::endl;
 
 
-  GLFWwindow *window = renderer::init(windowWidth, windowHeight, 1.0f);
+  GLFWwindow *window = renderer::init(windowWidth, windowHeight, 16.0f/9.0f);
 
 
   //// SHADERS ////
@@ -79,9 +79,9 @@ int main() {
     processInput(window);
 
 
-    std::vector<int> screenWidthHeight = renderer::getWindowDimensions();
+    //std::vector<int> screenWidthHeight = renderer::getWindowDimensions();
 
-    renderer::framebuffer_size_callback(window, screenWidthHeight[0], screenWidthHeight[1]);
+    //renderer::framebuffer_size_callback(window, screenWidthHeight[0], screenWidthHeight[1]);
 
 
     glClearColor(
@@ -97,18 +97,18 @@ int main() {
 
 
     render::rectangle::roundBordered(exRectangleRoundBordered, renderer::colour({0,0,0}), renderer::colour({0,1,0}));
-    render::standard::circle(exCircle, renderer::colour({1,0,0}));
-    render::standard::rectangle(exRectangle, renderer::colour({0,1,0}));
+    //render::standard::circle(exCircle, renderer::colour({1,0,0}));
+    //render::standard::rectangle(exRectangle, renderer::colour({0,1,0}));
     render::rectangle::rounded(exRectangleRounded, renderer::colour({0,0,1}));
     render::rectangle::bordered(exRectangleBordered, renderer::colour({1,1,1}), renderer::colour({1,0,0}));
-    render::standard::line(line, renderer::colour({0,1,0}));
+    //render::standard::line(line, renderer::colour({0,1,0}));
 
 
-    renderer::desiredScreenRatio = ( sin( ( glfwGetTime() / 10 ) * M_PI * 2 ) + 1.0f ) * 4;
+    //renderer::desiredScreenRatio = ( sin( ( glfwGetTime() / 10 ) * M_PI * 2 ) + 1.0f ) * 4;
 
-    render::standard::circle(circle1, renderer::colour({1,0,0},0.5));
-    render::standard::circle(circle2, renderer::colour({0,1,0},0.5));
-    render::standard::circle(circle3, renderer::colour({0,0,1},0.5));
+    //render::standard::circle(circle1, renderer::colour({1,0,0},0.5));
+    //render::standard::circle(circle2, renderer::colour({0,1,0},0.5));
+    //render::standard::circle(circle3, renderer::colour({0,0,1},0.5));
 
 
     // Modes (Swap out the first object given to glDrawElements
