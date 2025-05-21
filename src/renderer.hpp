@@ -163,6 +163,8 @@ static GLFWwindow* init(int width, int height, float desiredscrRatio) {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  exwindow = window;
+
   desiredScreenRatio = desiredscrRatio;
 
   return window;
@@ -231,7 +233,7 @@ class standard {
   }
   static void line(renderer::standard::line object, renderer::colour colour) {
 
-    int pointCount = object.points.size();
+    int pointCount = (int)object.points.size();
     float* points = new float[pointCount*8];
 
     for (int i = 0; i < pointCount; i++) {
