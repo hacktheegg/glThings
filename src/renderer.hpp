@@ -15,64 +15,192 @@
 
 namespace renderer {
 
+struct container {
+  container* containedIn = nullptr;
+  std::vector<float> wallsX = { -1.0f, 1.0f };
+  std::vector<float> wallsY = { -1.0f, 1.0f };
+  std::vector<float> posMultiplier = { 1.0f, 1.0f };
+
+  private:
+  std::vector<float> setPosMultiplier() {
+    if ((wallsX[1] - wallsX[0]) > (wallsY[1] - wallsY[0])) {
+      return { ((wallsX[1] - wallsX[0]) / (wallsY[1] - wallsY[0])), 1.0f };
+    } else {
+      return { 1.0f, ((wallsY[1] - wallsY[0]) / (wallsX[1] - wallsX[0])) };
+    }
+  }
+
+  public:
+  container() {
+    posMultiplier = setPosMultiplier();
+  }
+
+  container(container* inputContainedIn)
+    : containedIn(inputContainedIn) {
+      posMultiplier = setPosMultiplier();
+    }
+
+  container(std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+    : wallsX(inputWallsX), wallsY(inputWallsY) {
+      posMultiplier = setPosMultiplier();
+    }
+
+  container(container* inputContainedIn, std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+    : containedIn(inputContainedIn), wallsX(inputWallsX), wallsY(inputWallsY) {
+      posMultiplier = setPosMultiplier();
+    }
+
+};
+
 static GLFWwindow* exwindow = nullptr;
-static std::vector<float> posMultiplier = { 1.0f, 1.0f };
-static float desiredScreenRatio = 1.0f;
+static std::vector<float> globalPosMultiplier = { 1.0f, 1.0f };
+static float globalDesiredScreenRatio = 1.0f;
+static container baseContainer = container();
 
 namespace standard {
   struct circle {
-    std::vector<float> origin;
-    float radius;
-    circle() { origin = { 0.0f, 0.0f }; radius = 0.25; }
-    circle(std::vector<float> inputOrigin, float inputRadius) { origin = inputOrigin; radius = inputRadius; }
+    container* containedIn = &baseContainer;
+    std::vector<float> origin = { 0.0f, 0.0f };
+    float radius = 1.0f;
+
+    circle() {}
+
+    circle(container* inputContainedIn)
+      : containedIn(inputContainedIn) {}
+
+    circle(std::vector<float> inputOrigin, float inputRadius)
+      : origin(inputOrigin), radius(inputRadius) {}
+
+    circle(container* inputContainedIn, std::vector<float> inputOrigin, float inputRadius)
+      : containedIn(inputContainedIn), origin(inputOrigin), radius(inputRadius) {}
+
   };
   struct rectangle {
-    std::vector<float> wallsX;
-    std::vector<float> wallsY;
-    rectangle() { wallsX = { -0.25f, 0.25f }; wallsY = { -0.25f, 0.25f }; }
-    rectangle(std::vector<float> inputWallsX, std::vector<float> inputWallsY) {
-      wallsX = inputWallsX; wallsY = inputWallsY;
-    }
+    container* containedIn = &baseContainer;
+    std::vector<float> wallsX = { -1.0f, 1.0f };
+    std::vector<float> wallsY = { -1.0f, 1.0f };
+
+    rectangle() {}
+
+    rectangle(container* inputContainedIn)
+      : containedIn(inputContainedIn) {}
+
+    rectangle(std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+      : wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+    rectangle(container* inputContainedIn, std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+      : containedIn(inputContainedIn), wallsX(inputWallsX), wallsY(inputWallsY) {}
+
   };
   struct line {
-    std::vector<std::vector<float>> points;
-    line() { points = {{ -0.25f, -0.25f }, { 0.0f, 0.5f }, { 0.25f, 0.25f }}; }
-    line(std::vector<std::vector<float>> inputPoints) {
-      points = inputPoints;
-    }
+    container* containedIn = &baseContainer;
+    std::vector<std::vector<float>> points = {{ -1.0f, -1.0f }, { 0.0f, 1.0f }, { 1.0f, -1.0f }};
+
+    line() {}
+
+    line(container* inputContainedIn)
+      : containedIn(inputContainedIn) {}
+
+    line(std::vector<std::vector<float>> inputPoints)
+      : points(inputPoints) {}
+
+    line(container* inputContainedIn, std::vector<std::vector<float>> inputPoints)
+      : containedIn(inputContainedIn), points(inputPoints) {}
+
   };
 }
 
 namespace rectangle {
   struct bordered {
-    std::vector<float> wallsX = { -0.25f, 0.25f };
-    std::vector<float> wallsY = { -0.25f, 0.25f };
-    float borderWidth = 0.02f;
-    bordered() { wallsX = { -0.25f, 0.25f }; wallsY = { -0.25f, 0.25f }; borderWidth = 0.02f; }
-    bordered(std::vector<float> inputWallsX, std::vector<float> inputWallsY, float inputBorderWidth) {
-      wallsX = inputWallsX; wallsY = inputWallsY; borderWidth = inputBorderWidth;
-    }
+    container* containedIn = &baseContainer;
+    std::vector<float> wallsX = { -1.0f, 1.0f };
+    std::vector<float> wallsY = { -1.0f, 1.0f };
+    float borderWidth = 0.1f;
+
+    bordered() {}
+
+    bordered(container* inputContainedIn)
+      : containedIn(inputContainedIn) {}
+
+    bordered(float inputBorderWidth)
+      : borderWidth(inputBorderWidth) {}
+
+    bordered(std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+      : wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+    bordered(container* inputContainedIn, float inputBorderWidth)
+      : containedIn(inputContainedIn), borderWidth(inputBorderWidth) {}
+
+    bordered(container* inputContainedIn, std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+      : containedIn(inputContainedIn), wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+    bordered(std::vector<float> inputWallsX, std::vector<float> inputWallsY, float inputBorderWidth)
+      : wallsX(inputWallsX), wallsY(inputWallsY), borderWidth(inputBorderWidth) {}
+
+    bordered(container* inputContainedIn, std::vector<float> inputWallsX, std::vector<float> inputWallsY, float inputBorderWidth)
+      : containedIn(inputContainedIn), wallsX(inputWallsX), wallsY(inputWallsY), borderWidth(inputBorderWidth) {}
+
   };
   struct rounded {
-    std::vector<float> wallsX = { -0.25f, 0.25f };
-    std::vector<float> wallsY = { -0.25f, 0.25f };
+    container* containedIn = &baseContainer;
+    std::vector<float> wallsX = { -1.0f, 1.0f };
+    std::vector<float> wallsY = { -1.0f, 1.0f };
     float radius = 0.1f;
-    rounded() { wallsX = { -0.25f, 0.25f }; wallsY = { -0.25f, 0.25f }; radius = 0.1f; }
-    rounded(std::vector<float> inputWallsX, std::vector<float> inputWallsY, float inputRadius) {
-      wallsX = inputWallsX; wallsY = inputWallsY; radius = inputRadius;
-    }
+
+    rounded() {}
+
+    rounded(container* inputContainedIn)
+      : containedIn(inputContainedIn) {}
+
+    rounded(float inputRadius)
+      : radius(inputRadius) {}
+
+    rounded(std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+      : wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+    rounded(container* inputContainedIn, float inputRadius)
+      : containedIn(inputContainedIn), radius(inputRadius) {}
+
+    rounded(container* inputContainedIn, std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+      : containedIn(inputContainedIn), wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+    rounded(std::vector<float> inputWallsX, std::vector<float> inputWallsY, float inputRadius)
+      : wallsX(inputWallsX), wallsY(inputWallsY), radius(inputRadius) {}
+
+    rounded(container* inputContainedIn, std::vector<float> inputWallsX, std::vector<float> inputWallsY, float inputRadius)
+      : containedIn(inputContainedIn), wallsX(inputWallsX), wallsY(inputWallsY), radius(inputRadius) {}
+
   };
   struct roundBordered {
-    std::vector<float> wallsX = { -0.25f, 0.25f };
-    std::vector<float> wallsY = { -0.25f, 0.25f };
+    container* containedIn = &baseContainer;
+    std::vector<float> wallsX = { -1.0f, 1.0f };
+    std::vector<float> wallsY = { -1.0f, 1.0f };
     float radius = 0.1f;
-    float borderWidth = 0.02f;
-    roundBordered() { wallsX = { -0.25f, 0.25f }; wallsY = { -0.25f, 0.25f }; radius = 0.1f; borderWidth = 0.02f; }
-    roundBordered(std::vector<float> inputWallsX, std::vector<float> inputWallsY,
-      float inputRadius, float inputBorderWidth
-    ) {
-      wallsX = inputWallsX; wallsY = inputWallsY; radius = inputRadius; borderWidth = inputBorderWidth;
-    }
+    float borderWidth = 0.1f;
+
+    roundBordered() {}
+
+    roundBordered(container* inputContainedIn)
+      : containedIn(inputContainedIn) {}
+
+    roundBordered(float inputRadius, float inputBorderWidth)
+      : radius(inputRadius), borderWidth(inputBorderWidth) {}
+
+    roundBordered(std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+      : wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+    roundBordered(container* inputContainedIn, float inputRadius)
+      : containedIn(inputContainedIn), radius(inputRadius) {}
+
+    roundBordered(container* inputContainedIn, std::vector<float> inputWallsX, std::vector<float> inputWallsY)
+      : containedIn(inputContainedIn), wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+    roundBordered(std::vector<float> inputWallsX, std::vector<float> inputWallsY, float inputRadius, float inputBorderWidth)
+      : wallsX(inputWallsX), wallsY(inputWallsY), radius(inputRadius), borderWidth(inputBorderWidth) {}
+
+    roundBordered(container* inputContainedIn, std::vector<float> inputWallsX, std::vector<float> inputWallsY, float inputRadius, float inputBorderWidth)
+      : containedIn(inputContainedIn), wallsX(inputWallsX), wallsY(inputWallsY), radius(inputRadius), borderWidth(inputBorderWidth) {}
+
   };
 }
 
@@ -84,12 +212,23 @@ struct colour {
   colour(std::vector<float> inputRgb) { rgb = inputRgb; alpha = 1.0f; }
   colour(std::vector<float> inputRgb, float inputAlpha) { rgb = inputRgb; alpha = inputAlpha; }
 };
-static void addPoint(float *points, int counter,
+
+
+static void addPoint(container* containedBy, float *points, int counter,
   float p1, float p2, float p3, float p4,
   renderer::colour colour
 ) {
-  points[(counter*8)+0] = posMultiplier[0]*(p1);
-  points[(counter*8)+1] = posMultiplier[1]*(p2);
+
+
+  std::vector<float> pointPos = { p1, p2 };
+
+  
+  pointPos[0] = p1 * containedBy->posMultiplier[0];
+  pointPos[1] = p1 * containedBy->posMultiplier[1];
+
+
+  points[(counter*8)+0] = pointPos[0]*globalPosMultiplier[0];
+  points[(counter*8)+1] = pointPos[1]*globalPosMultiplier[1];
   points[(counter*8)+2] = p3;
   points[(counter*8)+3] = p4;
   points[(counter*8)+4] = colour.rgb[0];
@@ -97,6 +236,7 @@ static void addPoint(float *points, int counter,
   points[(counter*8)+6] = colour.rgb[2];
   points[(counter*8)+7] = colour.alpha;
 }
+
 
 static unsigned int VertexArrayObject, VertexBufferObject;
 
@@ -111,12 +251,12 @@ static std::vector<int> getWindowDimensions() {
 }
 static void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
-  if ((float)width > (float)height*desiredScreenRatio) {
-    posMultiplier[0] = (float)(height*desiredScreenRatio)/width;
-    posMultiplier[1] = 1.0f;
+  if ((float)width > (float)height*globalDesiredScreenRatio) {
+    globalPosMultiplier[0] = (float)(height*globalDesiredScreenRatio)/width;
+    globalPosMultiplier[1] = 1.0f;
   } else {
-    posMultiplier[0] = 1.0f;
-    posMultiplier[1] = (float)width/((float)height*desiredScreenRatio);
+    globalPosMultiplier[0] = 1.0f;
+    globalPosMultiplier[1] = (float)width/((float)height*globalDesiredScreenRatio);
   }
 
   glViewport(0, 0, width, height);
@@ -165,7 +305,7 @@ static GLFWwindow* init(int width, int height, float desiredscrRatio) {
 
   exwindow = window;
 
-  desiredScreenRatio = desiredscrRatio;
+  globalDesiredScreenRatio = desiredscrRatio;
 
   return window;
 
@@ -186,6 +326,8 @@ class standard {
     for (int counter = 0; counter < pointCount; counter++) {
 
       float angle = ((float)counter/pointCount)*360;
+
+
 
       renderer::addPoint(
         points, counter,
