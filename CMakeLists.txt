@@ -26,7 +26,6 @@ set(SOURCES
 )
 
 set(HEADERS
-    "${PROJECT_SOURCE_DIR}/src/physSolver.hpp"
     "${PROJECT_SOURCE_DIR}/src/renderer.hpp"
     "${PROJECT_SOURCE_DIR}/src/shader_s.hpp"
 )
