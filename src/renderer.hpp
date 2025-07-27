@@ -1,6 +1,7 @@
 #ifndef RENDERER
 #define RENDERER
 
+#include <string>
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -15,9 +16,35 @@
 
 namespace renderer {
 
+struct container {
+  // std::vector<container*> within;
+  container* within;
+  std::vector<float> wallsX;
+  std::vector<float> wallsY;
+
+  container()
+    : within(nullptr), wallsX({-1.0f, 1.0f}), wallsY({-1.0f, 1.0f}) {}
+
+  container(container* inputWithin)
+    : within(inputWithin), wallsX({-1.0f, 1.0f}), wallsY({-1.0f, 1.0f}) {}
+
+  container(
+    std::vector<float> inputWallsX,
+    std::vector<float> inputWallsY)
+    : within(nullptr), wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+  container(container* inputWithin,
+    std::vector<float> inputWallsX,
+    std::vector<float> inputWallsY)
+    : within(inputWithin), wallsX(inputWallsX), wallsY(inputWallsY) {}
+
+};
+
 static GLFWwindow* exwindow = nullptr;
+static container baseContainer = container({-1.0f,1.0f},{-1.0f,1.0f});
 static std::vector<float> posMultiplier = { 1.0f, 1.0f };
 static float desiredScreenRatio = 1.0f;
+
 
 namespace standard {
   struct circle {
@@ -84,12 +111,19 @@ struct colour {
   colour(std::vector<float> inputRgb) { rgb = inputRgb; alpha = 1.0f; }
   colour(std::vector<float> inputRgb, float inputAlpha) { rgb = inputRgb; alpha = inputAlpha; }
 };
-static void addPoint(float *points, int counter,
+
+static void addPoint(container* containedIn, float *points, int counter,
   float p1, float p2, float p3, float p4,
   renderer::colour colour
 ) {
-  points[(counter*8)+0] = posMultiplier[0]*(p1);
-  points[(counter*8)+1] = posMultiplier[1]*(p2);
+  points[(counter*8)+0] =
+    (((-containedIn->wallsX[0]+containedIn->wallsX[1])/2.0f*p1)
+    +(containedIn->wallsX[0]+containedIn->wallsX[1])/2.0f)*posMultiplier[0]
+  ;
+  points[(counter*8)+1] =
+    (((-containedIn->wallsY[0]+containedIn->wallsY[1])/2.0f*p2)
+    +(containedIn->wallsY[0]+containedIn->wallsY[1])/2.0f)*posMultiplier[1]
+  ;
   points[(counter*8)+2] = p3;
   points[(counter*8)+3] = p4;
   points[(counter*8)+4] = colour.rgb[0];
@@ -97,7 +131,15 @@ static void addPoint(float *points, int counter,
   points[(counter*8)+6] = colour.rgb[2];
   points[(counter*8)+7] = colour.alpha;
 }
-
+/*
+static inline void addPoint(float *points, int counter,
+  float p1, float p2, float p3, float p4,
+  renderer::colour colour
+) {
+  addPoint(&baseContainer, points, counter,
+    p1, p2, p3, p4, colour);
+}
+*/
 static unsigned int VertexArrayObject, VertexBufferObject;
 
 static std::vector<int> getWindowDimensions() {
@@ -118,6 +160,9 @@ static void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     posMultiplier[0] = 1.0f;
     posMultiplier[1] = (float)width/((float)height*desiredScreenRatio);
   }
+
+  // posMultiplier[0] = 1.0f;
+  // posMultiplier[1] = 1.0f;
 
   glViewport(0, 0, width, height);
 
@@ -165,7 +210,8 @@ static GLFWwindow* init(int width, int height, float desiredscrRatio) {
 
   exwindow = window;
 
-  desiredScreenRatio = desiredscrRatio;
+  // desiredScreenRatio = desiredscrRatio;
+  desiredScreenRatio = 1.0f;
 
   return window;
 
@@ -178,33 +224,34 @@ namespace render {
 
 class standard {
   public:
-  static void circle(renderer::standard::circle object, renderer::colour colour) {
-
+  static void circle(
+    renderer::container* containedIn,
+    renderer::standard::circle object,
+    renderer::colour colour
+  ) {
     int pointCount = 4*12;
     float* points = new float[pointCount*8];
-
     for (int counter = 0; counter < pointCount; counter++) {
-
       float angle = ((float)counter/pointCount)*360;
-
+      float xPos = ((cos((angle/180)*M_PI)*object.radius/renderer::desiredScreenRatio)+object.origin[0]);
+      float yPos = (sin((angle/180)*M_PI)*object.radius)+object.origin[1];
       renderer::addPoint(
-        points, counter,
-        ((cos((angle/180)*M_PI)*object.radius/renderer::desiredScreenRatio)+object.origin[0]),
-        (sin((angle/180)*M_PI)*object.radius)+object.origin[1],
+        containedIn, points, counter, xPos, yPos,
         0.0f, 1.0f, colour
       );
-
     }
-
     glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
-
     glDrawArrays(GL_TRIANGLE_FAN, 0, pointCount);
-
     delete [] points;
-
   }
-  static void rectangle(renderer::standard::rectangle object, renderer::colour colour) {
+  static inline void circle(
+    renderer::standard::circle object,
+    renderer::colour colour
+  ) {
+    circle(&renderer::baseContainer, object, colour);
+  }
+  static void rectangle(renderer::container* containedIn, renderer::standard::rectangle object, renderer::colour colour) {
 
     int pointCount = 4;
     float* points = new float[pointCount*8];
@@ -213,7 +260,7 @@ class standard {
 
     for (int i = 0; i < 4; i++) {
 
-      addPoint(
+      addPoint( containedIn,
         points, counter,
         object.wallsX[((i+0)/2)%2],
         object.wallsY[((i+1)/2)%2],
@@ -231,7 +278,13 @@ class standard {
     delete [] points;
 
   }
-  static void line(renderer::standard::line object, renderer::colour colour) {
+  static inline void rectangle(
+    renderer::standard::rectangle object,
+    renderer::colour colour
+  ) {
+    rectangle(&renderer::baseContainer, object, colour);
+  }
+  static void line(renderer::container* containedIn, renderer::standard::line object, renderer::colour colour) {
 
     int pointCount = (int)object.points.size();
     float* points = new float[pointCount*8];
@@ -239,7 +292,7 @@ class standard {
     for (int i = 0; i < pointCount; i++) {
 
       addPoint(
-        points, i,
+        containedIn, points, i,
         object.points[i][0],
         object.points[i][1],
         0.0f, 1.0f, colour
@@ -254,11 +307,17 @@ class standard {
     delete [] points;
 
   }
+  static inline void line(
+    renderer::standard::line object,
+    renderer::colour colour
+  ) {
+    line(&renderer::baseContainer, object, colour);
+  }
 };
 
 class rectangle {
   public:
-  static void rounded(renderer::rectangle::rounded object, renderer::colour colour) {
+  static void rounded(renderer::container* containedIn, renderer::rectangle::rounded object, renderer::colour colour) {
 
     int pointCount = (4*12)+4;
     float* points = new float[pointCount*8];
@@ -280,7 +339,7 @@ class rectangle {
         float angle = ((float)(((float)(pointCount-4)/4)*i+j)/(pointCount-4))*360;
 
         addPoint(
-          points, counter,
+          containedIn, points, counter,
           cos((angle/180)*M_PI)*object.radius/renderer::desiredScreenRatio+object.wallsX[((i+3)/2)%2]+wallsXRadiusModifier/renderer::desiredScreenRatio,
           sin((angle/180)*M_PI)*object.radius                             +object.wallsY[((i+2)/2)%2]+wallsYRadiusModifier,
           0.0f, 1.0f, colour
@@ -292,7 +351,7 @@ class rectangle {
       float allignmentAngle = ((float)(((float)(pointCount-4)/4)*i+((float)(pointCount-4)/4))/(pointCount-4))*360;
 
       addPoint(
-        points, counter+counterOffset,
+        containedIn, points, counter+counterOffset,
         cos(allignmentAngle/180*M_PI)*object.radius/renderer::desiredScreenRatio+object.wallsX[xIndex]+wallsXRadiusModifier/renderer::desiredScreenRatio,
         sin(allignmentAngle/180*M_PI)*object.radius                             +object.wallsY[yIndex]+wallsYRadiusModifier,
         0.0f, 1.0f, colour
@@ -310,7 +369,13 @@ class rectangle {
     delete [] points;
 
   }
-  static void bordered(renderer::rectangle::bordered object, renderer::colour colourInternal,
+  static inline void rounded(
+    renderer::rectangle::rounded object,
+    renderer::colour colour
+  ) {
+    rounded(&renderer::baseContainer, object, colour);
+  }
+  static void bordered(renderer::container* containedIn, renderer::rectangle::bordered object, renderer::colour colourInternal,
     renderer::colour colourBorder
   ) {
 
@@ -331,14 +396,14 @@ class rectangle {
       if (((i+1)/2)%2 == 1) { wallsYBorderModifier = -object.borderWidth; }
 
       addPoint(
-        pointsInternal, counter,
+        containedIn, pointsInternal, counter,
         object.wallsX[((i+0)/2)%2]+wallsXBorderModifier/renderer::desiredScreenRatio,
         object.wallsY[((i+1)/2)%2]+wallsYBorderModifier,
         0.0f, 1.0f, colourBorder
       );
 
       addPoint(
-        pointsExternal, counter,
+        containedIn, pointsExternal, counter,
         object.wallsX[((i+0)/2)%2],
         object.wallsY[((i+1)/2)%2],
         0.0f, 1.0f, colourInternal
@@ -358,7 +423,13 @@ class rectangle {
     delete [] pointsExternal;
 
   }
-  static void roundBordered(const renderer::rectangle::roundBordered object,
+  static inline void bordered(
+    renderer::rectangle::bordered object,
+    renderer::colour colourInternal, renderer::colour colourBorder
+  ) {
+    bordered(&renderer::baseContainer, object, colourInternal, colourBorder);
+  }
+  static void roundBordered(renderer::container* containedIn, const renderer::rectangle::roundBordered object,
     const renderer::colour colourInternal, const renderer::colour colourBorder
   ) {
 
@@ -388,14 +459,14 @@ class rectangle {
         float angle = ((float)(((float)(pointCount-4)/4)*i+j)/(pointCount-4))*360;
 
         addPoint(
-          pointsExternal, counter+counterOffset,
+          containedIn, pointsExternal, counter+counterOffset,
           cos(angle/180*M_PI)*object.radius/renderer::desiredScreenRatio+object.wallsX[xIndex]+wallsXRadiusModifier/renderer::desiredScreenRatio,
           sin(angle/180*M_PI)*object.radius                             +object.wallsY[yIndex]+wallsYRadiusModifier,
           0.0f, 1.0f, colourBorder
         );
 
         addPoint(
-          pointsInternal, counter+counterOffset,
+          containedIn, pointsInternal, counter+counterOffset,
           cos(angle/180*M_PI)*(object.radius-object.borderWidth)/renderer::desiredScreenRatio+object.wallsX[xIndex]+(wallsXBorderModifier+wallsXRadiusModifier)/renderer::desiredScreenRatio,
           sin(angle/180*M_PI)*(object.radius-object.borderWidth)                             +object.wallsY[yIndex]+(wallsYBorderModifier+wallsYRadiusModifier),
           0.0f, 1.0f, colourInternal
@@ -407,14 +478,14 @@ class rectangle {
       float allignmentAngle = ((float)(((float)(pointCount-4)/4)*i+((float)(pointCount-4)/4))/(pointCount-4))*360;
 
       addPoint(
-        pointsExternal, counter+counterOffset,
+        containedIn, pointsExternal, counter+counterOffset,
         cos(allignmentAngle/180*M_PI)*object.radius/renderer::desiredScreenRatio+object.wallsX[xIndex]+wallsXRadiusModifier/renderer::desiredScreenRatio,
         sin(allignmentAngle/180*M_PI)*object.radius                             +object.wallsY[yIndex]+wallsYRadiusModifier,
         0.0f, 1.0f, colourBorder
       );
 
       addPoint(
-        pointsInternal, counter+counterOffset,
+        containedIn, pointsInternal, counter+counterOffset,
         cos(allignmentAngle/180*M_PI)*(object.radius-object.borderWidth)/renderer::desiredScreenRatio+object.wallsX[xIndex]+(wallsXBorderModifier+wallsXRadiusModifier)/renderer::desiredScreenRatio,
         sin(allignmentAngle/180*M_PI)*(object.radius-object.borderWidth)                             +object.wallsY[yIndex]+(wallsYBorderModifier+wallsYRadiusModifier),
         0.0f, 1.0f, colourInternal
@@ -434,6 +505,12 @@ class rectangle {
     delete [] pointsInternal;
     delete [] pointsExternal;
 
+  }
+  static inline void roundBordered(
+    renderer::rectangle::roundBordered object,
+    renderer::colour colourInternal, renderer::colour colourBorder
+  ) {
+    roundBordered(&renderer::baseContainer, object, colourInternal, colourBorder);
   }
 };
 

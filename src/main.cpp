@@ -28,7 +28,7 @@ int main() {
   std::cout << "Hello, World!" << std::endl;
 
 
-  GLFWwindow *window = renderer::init(windowWidth, windowHeight, 16.0f/9.0f);
+  GLFWwindow *window = renderer::init(windowWidth, windowHeight, 1.0f);
 
 
   //// SHADERS ////
@@ -69,19 +69,36 @@ int main() {
   renderer::getWindowHandle(window);
 
 
+  renderer::container PositivePositive = renderer::container({0.0f,1.0f},{0.0f,1.0f});
+
   // uncomment this call to draw in wireframe polygons.
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while (!glfwWindowShouldClose(window)) {
 
-    //std::cout << renderer::getWindowDimensions()[0] << std::endl;
+    //std::cout << static_cast<float>(sin(glfwGetTime()*0.5f)) << std::endl;
+
+    /*
+    renderer::baseContainer.wallsX[0] = static_cast<float>(sin(
+      (glfwGetTime()*M_PI + (M_PI /4 *0)) * 0.5f
+    ));
+    renderer::baseContainer.wallsX[1] = static_cast<float>(sin(
+      (glfwGetTime()*M_PI + (M_PI /4 *2)) * 0.5f
+    ));
+    renderer::baseContainer.wallsY[0] = static_cast<float>(sin(
+      (glfwGetTime()*M_PI + (M_PI /4 *4)) * 0.5f
+    ));
+    renderer::baseContainer.wallsY[1] = static_cast<float>(sin(
+      (glfwGetTime()*M_PI + (M_PI /4 *6)) * 0.5f
+    ));
+    */
 
     processInput(window);
 
 
-    std::vector<int> screenWidthHeight = renderer::getWindowDimensions();
+    // std::vector<int> screenWidthHeight = renderer::getWindowDimensions();
 
-    renderer::desiredScreenRatio = (float)screenWidthHeight[0]/screenWidthHeight[1];
+    // renderer::desiredScreenRatio = (float)screenWidthHeight[0]/screenWidthHeight[1];
     //renderer::framebuffer_size_callback(window, screenWidthHeight[0], screenWidthHeight[1]);
 
 
@@ -98,12 +115,17 @@ int main() {
 
 
     render::rectangle::roundBordered(exRectangleRoundBordered, renderer::colour({0,0,0}), renderer::colour({0,1,0}));
-    //render::standard::circle(exCircle, renderer::colour({1,0,0}));
+    render::standard::circle(exCircle, renderer::colour({1,0,0}));
     //render::standard::rectangle(exRectangle, renderer::colour({0,1,0}));
     render::rectangle::rounded(exRectangleRounded, renderer::colour({0,0,1}));
     render::rectangle::bordered(exRectangleBordered, renderer::colour({1,1,1}), renderer::colour({1,0,0}));
     //render::standard::line(line, renderer::colour({0,1,0}));
 
+
+    render::standard::rectangle(&PositivePositive,
+      renderer::standard::rectangle({-1.0f,1.0f},{-1.0f,1.0f}),
+      renderer::colour({0,1,0}));
+    
 
     //renderer::desiredScreenRatio = ( sin( ( glfwGetTime() / 10 ) * M_PI * 2 ) + 1.0f ) * 4;
 
