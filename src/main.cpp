@@ -70,6 +70,15 @@ int main() {
 
 
   renderer::container PositivePositive = renderer::container({0.0f,1.0f},{0.0f,1.0f});
+  renderer::container NegativeNegative = renderer::container({-1.0f,0.0f},{-1.0f,0.0f});
+  renderer::container defaultContainer = renderer::container({-0.5f,0.5f},{-0.5f,0.5f});
+
+        defaultContainer.within = &NegativeNegative;
+        NegativeNegative.within = &PositivePositive;
+        PositivePositive.within = nullptr;
+
+  float waitingTimer = glfwGetTime()+1.0f;
+  bool toggle = false;
 
   // uncomment this call to draw in wireframe polygons.
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -101,6 +110,21 @@ int main() {
     // renderer::desiredScreenRatio = (float)screenWidthHeight[0]/screenWidthHeight[1];
     //renderer::framebuffer_size_callback(window, screenWidthHeight[0], screenWidthHeight[1]);
 
+    if (glfwGetTime() > waitingTimer) {
+      waitingTimer = glfwGetTime() + 1.0f;
+      toggle = !toggle;
+      // std::cout << toggle << std::endl;
+      if (toggle) {
+        defaultContainer.within = &NegativeNegative;
+        NegativeNegative.within = &PositivePositive;
+        PositivePositive.within = nullptr;
+      } else {
+        // defaultContainer.within = &PositivePositive;
+        // PositivePositive.within = &NegativeNegative;
+        // NegativeNegative.within = nullptr;
+      }
+    }
+
 
     glClearColor(
       /*
@@ -121,8 +145,12 @@ int main() {
     render::rectangle::bordered(exRectangleBordered, renderer::colour({1,1,1}), renderer::colour({1,0,0}));
     //render::standard::line(line, renderer::colour({0,1,0}));
 
+    renderer::container containerE({-0.5f,0.5f},{-0.5f,0.5f});
 
-    render::standard::rectangle(&PositivePositive,
+    render::standard::rectangle(&containerE,
+      renderer::standard::rectangle({-1.0f,1.0f},{-1.0f,1.0f}),
+      renderer::colour({1,0,0}));
+    render::standard::rectangle(&defaultContainer,
       renderer::standard::rectangle({-1.0f,1.0f},{-1.0f,1.0f}),
       renderer::colour({0,1,0}));
     

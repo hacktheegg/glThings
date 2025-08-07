@@ -61,6 +61,13 @@ namespace standard {
       wallsX = inputWallsX; wallsY = inputWallsY;
     }
   };
+  struct polygon {
+    std::vector<std::vector<float>> points;
+    polygon() { points = { { -1.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f }, { 0.0f, -1.0f } }; }
+    polygon(std::vector<std::vector<float>> inputPoints) {
+      points = inputPoints;
+    }
+  };
   struct line {
     std::vector<std::vector<float>> points;
     line() { points = {{ -0.25f, -0.25f }, { 0.0f, 0.5f }, { 0.25f, 0.25f }}; }
@@ -116,14 +123,48 @@ static void addPoint(container* containedIn, float *points, int counter,
   float p1, float p2, float p3, float p4,
   renderer::colour colour
 ) {
-  points[(counter*8)+0] =
-    (((-containedIn->wallsX[0]+containedIn->wallsX[1])/2.0f*p1)
-    +(containedIn->wallsX[0]+containedIn->wallsX[1])/2.0f)*posMultiplier[0]
+
+  container* currentContainer = containedIn;
+
+  float currentXPoint = p1;
+
+
+  while (containedIn != nullptr) {
+
+
+
+
+
+
+  }
+
+
+
+
+  float currentYPoint =
+    (((-currentContainer->wallsY[0]+currentContainer->wallsY[1])/2.0f*p2)
+    +(currentContainer->wallsY[0]+currentContainer->wallsY[1])/2.0f)
   ;
-  points[(counter*8)+1] =
-    (((-containedIn->wallsY[0]+containedIn->wallsY[1])/2.0f*p2)
-    +(containedIn->wallsY[0]+containedIn->wallsY[1])/2.0f)*posMultiplier[1]
-  ;
+
+  // currentContainer = currentContainer->within;
+  //
+  // while (currentContainer != nullptr) {
+  //
+  // currentXPoint =
+  //   (((-currentContainer->wallsX[0]+currentContainer->wallsX[1])/2.0f*currentXPoint)
+  //   +(currentContainer->wallsX[0]+currentContainer->wallsX[1])/2.0f)
+  // ;
+  // currentYPoint =
+  //   (((-currentContainer->wallsY[0]+currentContainer->wallsY[1])/2.0f*currentYPoint)
+  //   +(currentContainer->wallsY[0]+currentContainer->wallsY[1])/2.0f)
+  // ;
+  //
+  // currentContainer = currentContainer->within;
+  //
+  // }
+
+  points[(counter*8)+0] = currentXPoint*posMultiplier[0];
+  points[(counter*8)+1] = currentYPoint*posMultiplier[1];
   points[(counter*8)+2] = p3;
   points[(counter*8)+3] = p4;
   points[(counter*8)+4] = colour.rgb[0];
@@ -131,7 +172,6 @@ static void addPoint(container* containedIn, float *points, int counter,
   points[(counter*8)+6] = colour.rgb[2];
   points[(counter*8)+7] = colour.alpha;
 }
-/*
 static inline void addPoint(float *points, int counter,
   float p1, float p2, float p3, float p4,
   renderer::colour colour
@@ -139,7 +179,7 @@ static inline void addPoint(float *points, int counter,
   addPoint(&baseContainer, points, counter,
     p1, p2, p3, p4, colour);
 }
-*/
+
 static unsigned int VertexArrayObject, VertexBufferObject;
 
 static std::vector<int> getWindowDimensions() {
@@ -284,7 +324,7 @@ class standard {
   ) {
     rectangle(&renderer::baseContainer, object, colour);
   }
-  static void line(renderer::container* containedIn, renderer::standard::line object, renderer::colour colour) {
+  static void polygon(renderer::container* containedIn, renderer::standard::polygon object, renderer::colour colour) {
 
     int pointCount = (int)object.points.size();
     float* points = new float[pointCount*8];
@@ -303,6 +343,35 @@ class standard {
     glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
     glDrawArrays(GL_LINE_STRIP, 0, pointCount);
+
+    delete [] points;
+
+  }
+  static inline void polygon(
+    renderer::standard::polygon object,
+    renderer::colour colour
+  ) {
+    polygon(&renderer::baseContainer, object, colour);
+  }
+  static void line(renderer::container* containedIn, renderer::standard::line object, renderer::colour colour) {
+
+    int pointCount = (int)object.points.size();
+    float* points = new float[pointCount*8];
+
+    for (int i = 0; i < pointCount; i++) {
+
+      addPoint(
+        containedIn, points, i,
+        object.points[i][0],
+        object.points[i][1],
+        0.0f, 1.0f, colour
+      );
+
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, pointCount);
 
     delete [] points;
 
