@@ -126,21 +126,10 @@ static void addPoint(container* containedIn, float *points, int counter,
 
   container* currentContainer = containedIn;
 
-  float currentXPoint = p1;
-
-
-  while (containedIn != nullptr) {
-
-
-
-
-
-
-  }
-
-
-
-
+  float currentXPoint =
+    (((-currentContainer->wallsX[0]+currentContainer->wallsX[1])/2.0f*p1)
+    +(currentContainer->wallsX[0]+currentContainer->wallsX[1])/2.0f)
+  ;
   float currentYPoint =
     (((-currentContainer->wallsY[0]+currentContainer->wallsY[1])/2.0f*p2)
     +(currentContainer->wallsY[0]+currentContainer->wallsY[1])/2.0f)
@@ -371,7 +360,7 @@ class standard {
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, pointCount);
+    glDrawArrays(GL_LINE_STRIP, 0, pointCount);
 
     delete [] points;
 
