@@ -331,7 +331,7 @@ class standard {
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer::VertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pointCount*8, points, GL_DYNAMIC_DRAW);
-    glDrawArrays(GL_LINE_STRIP, 0, pointCount);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, pointCount);
 
     delete [] points;
 
